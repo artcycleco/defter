@@ -186,7 +186,7 @@ body.odak-kip #sorular .card.odak-bu{box-shadow:0 10px 40px rgba(0,0,0,.08)}
   const once=t=>{const d=gun(t);if(d===null||!t)return'';if(d<1/24)return'az önce';if(d<1)return Math.floor(d*24)+' sa önce';if(d<2)return'dün';if(d<30)return Math.floor(d)+' gün önce';return new Date(t).toLocaleDateString('tr-TR',{day:'numeric',month:'short'})};
   const acildiT=a=>/T/.test(String(a))?a:a+'T00:00:00';
   const bekleme=a=>{if(!a)return'';const d=gun(acildiT(a));if(d===null||d<1)return'';return Math.floor(d)+' gündür'};
-  const TUR={design:'✎ kararın',tech:'⚙ teknik',info:'ⓘ bilgi',report:'▤ rapor',task:'☐ görev'};
+  const turEt={design:'✎ kararın',tech:'⚙ teknik',info:'ⓘ bilgi',report:'▤ rapor',task:'☐ görev'};
   const temiz=t=>String(t||'').replace(/^[✎⚙ⓘ▤☐]\s*/,'');
   const mSinif=m=>'m'+(({yok:0,'düşük':1,orta:2,'yüksek':3})[String(m).split(/[\s·,]/)[0].toLocaleLowerCase('tr')]??1);
   const etkin=()=>satirlar.filter(r=>!r.arsiv);
@@ -197,7 +197,7 @@ body.odak-kip #sorular .card.odak-bu{box-shadow:0 10px 40px rgba(0,0,0,.08)}
   function sorular(){const l=[];etkin().forEach(r=>(r.maddeler||[]).forEach(m=>l.push({r,m})));return l}
   // ── soru kartı: defterin kartıyla aynı sınıflar (card, head, pill, rec, opts, foot)
   function kartHtml(r,m){const k=cid(r,m),c=cevaplar[k],hal=cevapHali(r,m),ac=acik.has(k)||ayar.sikAcik;
-    const pills=`${m.p===1?'<span class="pill p1">Acil</span>':(m.p===3?'<span class="pill p3">Sonra</span>':'<span class="pill p2">Önemli</span>')}<span class="pill ${m.y==='design'?'design':(m.y==='task'?'task':'')}">${TUR[m.y]||''}</span>${m.k==='dis'||m.k==='donulmez'?`<span class="pill risk r-${m.k==='dis'?'dis':'donulmez'}">${m.k==='dis'?'dışa dönük':'geri dönülmez'}</span>`:''}${bekleme(m.a)?`<span class="pill bekleme">${bekleme(m.a)}</span>`:''}${m.d?`<span class="pill due">⏱ ${esc(m.d)}</span>`:''}`;
+    const pills=`${m.p===1?'<span class="pill p1">Acil</span>':(m.p===3?'<span class="pill p3">Sonra</span>':'<span class="pill p2">Önemli</span>')}<span class="pill ${m.y==='design'?'design':(m.y==='task'?'task':'')}">${turEt[m.y]||''}</span>${m.k==='dis'||m.k==='donulmez'?`<span class="pill risk r-${m.k==='dis'?'dis':'donulmez'}">${m.k==='dis'?'dışa dönük':'geri dönülmez'}</span>`:''}${bekleme(m.a)?`<span class="pill bekleme">${bekleme(m.a)}</span>`:''}${m.d?`<span class="pill due">⏱ ${esc(m.d)}</span>`:''}`;
     const bas=`<div class="head"><span class="id">${esc(m.id)}</span><h3 class="title">${inl(temiz(m.t))}</h3>${pills}${c?`<span class="pill ${hal==='islendi'?'ok':'bekle'}">${hal==='islendi'?'işlendi':'gönderildi'}</span>`:''}</div><p class="defter-adi">${esc(r.ad||r.id)}</p>`;
     if(c)return `<article class="card gitti" data-c="${esc(k)}">${bas}<div class="gitti-satir"><span>Cevabın: <b>${esc(c.label||c.note||'tamam')}</b>${c.label&&c.note?' · '+esc(c.note):''}</span>${hal==='bekliyor'?'<span>Ajan okuyunca defterine işlenir.</span><button class="btn ghost" data-geri="'+esc(k)+'">Geri al</button>':''}</div></article>`;
     const secenekli=Array.isArray(m.o)&&m.o.length,gorev=!!m.s,rv=m.rv,onerilen=v=>Array.isArray(rv)?rv.includes(v):rv===v;
@@ -212,18 +212,18 @@ body.odak-kip #sorular .card.odak-bu{box-shadow:0 10px 40px rgba(0,0,0,.08)}
         <span class="ret-neden" data-ret-kutu="${esc(k)}" hidden>${['Pahalı','Beğenmedim','Erken','Başka'].map(x=>`<button type="button" class="hz kucuk" data-ret="${esc(k)}" data-neden="${x}">${x}</button>`).join('')}</span></div></article>`}
   let odakKip=false,odakIdx=0,odak=-1;try{odakKip=sessionStorage.getItem('merkez-odak')==='1'}catch(_){}
   function ciz(){
-    const E=etkin(),arsN=satirlar.length-E.length;
+    const etkinler=etkin(),arsN=satirlar.length-etkinler.length;
     const enSon=Math.max(son,...satirlar.map(r=>+r.surum||0));
     const S=sorular(),bekleyen=S.filter(x=>!cevaplar[cid(x.r,x.m)]),acilN=bekleyen.filter(x=>x.m.p===1).length,sz=sessizMi();
     const bugun=Object.values(cevaplar).filter(c=>c.at&&new Date(c.at).toDateString()===new Date().toDateString()).length;
     const gitti=Object.keys(cevaplar).length;
     const enEski=bekleyen.reduce((a,x)=>{const d=x.m.a?gun(acildiT(x.m.a)):null;return d!==null&&(!a||d>a.d)?{d,ad:x.r.ad}:a},null);
-    const bagli=E.filter(r=>Array.isArray(r.maddeler)).length;
-    $('durum').innerHTML=satirlar.length?`<b>${E.length}</b> defter${arsN?' (+'+arsN+' arşivde)':''}; <b>${bagli}</b> tanesi sorularını buraya gönderiyor.${E.length>bagli?' Ötekiler ajanları defteri sürüm 45 ile okuyunca katılır.':''}`:'Henüz kayıtlı defter yok.';
+    const bagli=etkinler.filter(r=>Array.isArray(r.maddeler)).length;
+    $('durum').innerHTML=satirlar.length?`<b>${etkinler.length}</b> defter${arsN?' (+'+arsN+' arşivde)':''}; <b>${bagli}</b> tanesi sorularını buraya gönderiyor.${etkinler.length>bagli?' Ötekiler ajanları defteri sürüm 45 ile okuyunca katılır.':''}`:'Henüz kayıtlı defter yok.';
     $('ozet').hidden=!satirlar.length;
-    $('ozet').innerHTML=`<button type="button" class="${acilN?'acil':''}" data-git="acil"><b>${acilN}</b><span>acil soru</span></button><button type="button" data-git="sorular"><b>${bekleyen.length}</b><span>cevap bekleyen</span></button><button type="button" data-git="bugun"><b>${bekleyen.filter(x=>bugunMu(x.m)).length}</b><span>bugün bakılacak</span></button><button type="button" data-git="gitti"><b>${bugun}</b><span>bugün verdiğin cevap</span></button>${enEski?`<div><b>${Math.floor(enEski.d)} gün</b><span>en eski bekleyen: ${esc(enEski.ad)}</span></div>`:`<div><b>${bagli} / ${E.length}</b><span>defter sorularını gönderiyor</span></div>`}`;
-    $('nSoru').textContent=bekleyen.length||'';$('nDefter').textContent=E.length||'';$('nArsiv').textContent=arsN||'';
-    $('mSoru').textContent=bekleyen.length;$('mBugun').textContent=bekleyen.filter(x=>bugunMu(x.m)).length;$('mGitti').textContent=gitti;$('mDefter').textContent=E.length;$('mArsiv').textContent=arsN;
+    $('ozet').innerHTML=`<button type="button" class="${acilN?'acil':''}" data-git="acil"><b>${acilN}</b><span>acil soru</span></button><button type="button" data-git="sorular"><b>${bekleyen.length}</b><span>cevap bekleyen</span></button><button type="button" data-git="bugun"><b>${bekleyen.filter(x=>bugunMu(x.m)).length}</b><span>bugün bakılacak</span></button><button type="button" data-git="gitti"><b>${bugun}</b><span>bugün verdiğin cevap</span></button>${enEski?`<div><b>${window.Math.floor(enEski.d)} gün</b><span>en eski bekleyen: ${esc(enEski.ad)}</span></div>`:`<div><b>${bagli} / ${etkinler.length}</b><span>defter sorularını gönderiyor</span></div>`}`;
+    $('nSoru').textContent=bekleyen.length||'';$('nDefter').textContent=etkinler.length||'';$('nArsiv').textContent=arsN||'';
+    $('mSoru').textContent=bekleyen.length;$('mBugun').textContent=bekleyen.filter(x=>bugunMu(x.m)).length;$('mGitti').textContent=gitti;$('mDefter').textContent=etkinler.length;$('mArsiv').textContent=arsN;
     $('count').textContent=bekleyen.length?bekleyen.length+' bekliyor':'hepsi cevaplı';
     $('barfill').style.width=Math.round(100*(S.length-bekleyen.length)/Math.max(1,S.length))+'%';
     $('menuBtn').dataset.nokta=acilN&&!sz?'1':'';document.title=(acilN&&!sz?'('+acilN+') ':'')+'Defter Merkezi';
@@ -231,8 +231,8 @@ body.odak-kip #sorular .card.odak-bu{box-shadow:0 10px 40px rgba(0,0,0,.08)}
     ['sorular','defterler','kararlar','arsiv'].forEach(s=>$('p-'+s).hidden=s!==sekme);
     document.querySelectorAll('[data-s]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.s===suz));
     document.querySelectorAll('[data-d]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.d===dsuz));
-    const sec=$('defterSec'),secOnce=sec.value;sec.innerHTML='<option value="">Bütün defterler</option>'+E.filter(r=>(r.maddeler||[]).length).map(r=>`<option value="${esc(r.id)}">${esc(r.ad||r.id)} (${(r.maddeler||[]).filter(m=>!cevaplar[cid(r,m)]).length})</option>`).join('');sec.value=secOnce;
-    const gruplar=E.filter(r=>(r.maddeler||[]).length&&(!defterSec||r.id===defterSec)).sort((a,b)=>(+b.acil||0)-(+a.acil||0)||(b.maddeler.length-a.maddeler.length));
+    const sec=$('defterSec'),secOnce=sec.value;sec.innerHTML='<option value="">Bütün defterler</option>'+etkinler.filter(r=>(r.maddeler||[]).length).map(r=>`<option value="${esc(r.id)}">${esc(r.ad||r.id)} (${(r.maddeler||[]).filter(m=>!cevaplar[cid(r,m)]).length})</option>`).join('');sec.value=secOnce;
+    const gruplar=etkinler.filter(r=>(r.maddeler||[]).length&&(!defterSec||r.id===defterSec)).sort((a,b)=>(+b.acil||0)-(+a.acil||0)||(b.maddeler.length-a.maddeler.length));
     const uy=(r,m)=>{const c=cevaplar[cid(r,m)];if(suz==='gitti')return !!c;if(c&&cevapHali(r,m)==='islendi')return false;if(suz==='acil')return m.p===1&&!c;if(suz==='bugun')return !c&&bugunMu(m);if(suz==='oneri')return !!(m.r||m.rv)&&!c;return true};
     const sira=(r,m)=>(cevaplar[cid(r,m)]?2:0)+(sonraya[cid(r,m)]?1:0);
     const html=gruplar.map(r=>{const l=r.maddeler.filter(m=>uy(r,m)).sort((a,b)=>sira(r,a)-sira(r,b)||(a.p||2)-(b.p||2));if(!l.length)return'';
@@ -242,19 +242,19 @@ body.odak-kip #sorular .card.odak-bu{box-shadow:0 10px 40px rgba(0,0,0,.08)}
     const tas={};document.querySelectorAll('#sorular .card[data-c]').forEach(a=>{const t=a.querySelector('textarea');tas[a.dataset.c]={n:t?t.value:'',s:[...a.querySelectorAll('.opts input:checked')].map(x=>x.value)}});
     const of=document.activeElement&&document.activeElement.closest&&document.activeElement.closest('#sorular .card[data-c]');const ofC=of&&of.dataset.c,ofNot=of&&document.activeElement.tagName==='TEXTAREA';
     $('sorular').innerHTML=html||`<div class="bos">${suz==='gitti'?'Buradan gönderdiğin cevap yok.':(S.length?'Bu süzgeçte soru yok.':'Ajanlar defterlerini okudukça açık sorular buraya gelir.')}</div>`;
-    Object.entries(tas).forEach(([c,v])=>{const a=document.querySelector(`#sorular .card[data-c="${CSS.escape(c)}"]`);if(!a)return;const t=a.querySelector('textarea');if(t)t.value=v.n;a.querySelectorAll('.opts input').forEach(x=>{if(v.s.includes(x.value))x.checked=true})});
-    if(ofC&&ofNot){const a=document.querySelector(`#sorular .card[data-c="${CSS.escape(ofC)}"] textarea`);a&&a.focus({preventScroll:true})}
+    Object.entries(tas).forEach(([c,v])=>{const a=document.querySelector(`#sorular .card[data-c="${window.CSS.escape(c)}"]`);if(!a)return;const t=a.querySelector('textarea');if(t)t.value=v.n;a.querySelectorAll('.opts input').forEach(x=>{if(v.s.includes(x.value))x.checked=true})});
+    if(ofC&&ofNot){const a=document.querySelector(`#sorular .card[data-c="${window.CSS.escape(ofC)}"] textarea`);a&&a.focus({preventScroll:true})}
     odakUygula();
     const eski=r=>(+r.surum||0)>0&&(+r.surum)<enSon,durgun=r=>gun(r.son)!==null&&gun(r.son)>30;
-    let D=E.slice();if(dsuz==='acik')D=D.filter(r=>(+r.acik||0)>0);if(dsuz==='eski')D=D.filter(eski);if(dsuz==='durgun')D=D.filter(durgun);
+    let D=etkinler.slice();if(dsuz==='acik')D=D.filter(r=>(+r.acik||0)>0);if(dsuz==='eski')D=D.filter(eski);if(dsuz==='durgun')D=D.filter(durgun);
     D.sort((a,b)=>(+b.acil||0)-(+a.acil||0)||(+b.acik||0)-(+a.acik||0)||String(b.son||'').localeCompare(String(a.son||'')));
-    $('defterler').innerHTML=tablo(D,{eski,durgun})+(dsuz==='hepsi'?saglikHtml(E):'');
+    $('defterler').innerHTML=tablo(D,{eski,durgun})+(dsuz==='hepsi'?saglikHtml(etkinler):'');
     const A=satirlar.filter(r=>r.arsiv);$('arsiv').innerHTML=A.length?tablo(A,{eski,durgun,arsiv:true}):'<div class="bos">Arşivde defter yok.</div>';
     $('altNot').textContent=bagli?'Sorular her defterin ajanı defteri son okuduğunda yazıldı. Defterin içinde cevapladığın soru, ajan bir sonraki okumada buradan düşer.':'';
     kararCiz()}
   // ajan uzun süredir okumadıysa ve burada bekleyen cevap varsa söyle; çelişen cevapları göster
   function uyariHtml(r){const bek=(r.maddeler||[]).filter(m=>cevapHali(r,m)==='bekliyor').length,g=gun(r.son);let h='';
-    if(bek&&g!==null&&g>=2)h+=`<p class="ajan-durum uyari"><b>Ajan ${Math.floor(g)} gündür okumadı.</b> Buradan gönderdiğin ${bek} cevap bekliyor; o defterin ajan oturumunda "defteri oku" de ya da defterdeki Ajana haber ver'e bas.</p>`;
+    if(bek&&g!==null&&g>=2)h+=`<p class="ajan-durum uyari"><b>Ajan ${window.Math.floor(g)} gündür okumadı.</b> Buradan gönderdiğin ${bek} cevap bekliyor; o defterin ajan oturumunda "defteri oku" de ya da defterdeki Ajana haber ver'e bas.</p>`;
     (r.celiski||[]).forEach(c=>{h+=`<p class="ajan-durum uyari"><b>${esc(c.id)}: iki cevap.</b> Defterde "${esc(c.defter)}", burada "${esc(c.merkez)}". Ajan teyit soracak.</p>`});return h}
   function saglikHtml(L){const S=L.filter(r=>r.saglik);if(!S.length)return'';
     return '<h2 class="saglik-bas">Bu haftanın sağlığı</h2><div class="tablo-sar"><table class="merkez-tablo"><thead><tr><th>Defter</th><th class="sayi">Kapanan</th><th class="sayi">Ortalama bekleme</th><th class="sayi">Gereksiz</th><th class="sayi">Hayır</th></tr></thead><tbody>'+S.map(r=>{const s=r.saglik;const b=s.ortBekleme==null?'?':(s.ortBekleme>=48?Math.round(s.ortBekleme/24)+' gün':s.ortBekleme+' sa');
@@ -280,7 +280,7 @@ body.odak-kip #sorular .card.odak-bu{box-shadow:0 10px 40px rgba(0,0,0,.08)}
     if(r.defterId)d.defterId=r.defterId;
     try{await db.doc('cevap/'+cid(r,m)).set(d);acik.delete(cid(r,m));setStatus(m.id+' gönderildi; defteri açınca ya da ajan okuyunca işlenir','ok');cevapDosyasiPlanla();return true}catch(_){setStatus('gönderilemedi; yeniden dene','uyari');return false}}
   const onayVeri=m=>{const rv=m.rv,secim=Array.isArray(m.o)&&m.o.length&&rv?rv:undefined;return {choice:secim,label:secim!==undefined?etiket(m,secim):'',note:secim!==undefined?'Öneri onaylandı':(m.s?'Yaptım':(m.y==='report'||m.y==='info'?'Okudum':'Tamam')),sinif:'onay'}};
-  async function birincil(k){const [r,m]=bul(k);if(!r)return;const a=document.querySelector(`#sorular .card[data-c="${CSS.escape(k)}"]`);const g=a&&a.querySelector('.getir');
+  async function birincil(k){const [r,m]=bul(k);if(!r)return;const a=document.querySelector(`#sorular .card[data-c="${window.CSS.escape(k)}"]`);const g=a&&a.querySelector('.getir');
     if(g&&!g.hidden){const sec=[...a.querySelectorAll('.opts input:checked')].map(x=>x.value);const not=(a.querySelector('textarea').value||'').trim();
       if(!sec.length&&!not){setStatus('bir şık seç ya da not yaz','uyari');return}
       const choice=sec.length?(m.c?sec:sec[0]):undefined;await gonder(r,m,{choice,label:choice!==undefined?etiket(m,choice):'',note:not,sinif:sinifla(not)});return}
@@ -291,8 +291,8 @@ body.odak-kip #sorular .card.odak-bu{box-shadow:0 10px 40px rgba(0,0,0,.08)}
     if(b.dataset.s){suz=b.dataset.s;yerel('merkez-suz2',suz);ciz();return}
     if(b.dataset.d){dsuz=b.dataset.d;ciz();return}
     if(b.dataset.kucult){const id=b.dataset.kucult;if(kucuk[id])delete kucuk[id];else kucuk[id]=1;yerel('merkez-kucuk',JSON.stringify(kucuk));ciz();return}
-    if(b.dataset.getir){const k=b.dataset.getir;if(acik.has(k))acik.delete(k);else acik.add(k);ciz();if(acik.has(k)){const a=document.querySelector(`#sorular .card[data-c="${CSS.escape(k)}"] .getir`);const i=a&&a.querySelector('input,textarea');i&&i.focus({preventScroll:true})}return}
-    if(b.dataset.hayir){const k=document.querySelector(`[data-ret-kutu="${CSS.escape(b.dataset.hayir)}"]`);if(k)k.hidden=!k.hidden;return}
+    if(b.dataset.getir){const k=b.dataset.getir;if(acik.has(k))acik.delete(k);else acik.add(k);ciz();if(acik.has(k)){const a=document.querySelector(`#sorular .card[data-c="${window.CSS.escape(k)}"] .getir`);const i=a&&a.querySelector('input,textarea');i&&i.focus({preventScroll:true})}return}
+    if(b.dataset.hayir){const k=document.querySelector(`[data-ret-kutu="${window.CSS.escape(b.dataset.hayir)}"]`);if(k)k.hidden=!k.hidden;return}
     if(b.dataset.birincil){await birincil(b.dataset.birincil);return}
     if(b.dataset.ret){const [r,m]=bul(b.dataset.ret);if(!r)return;const a=b.closest('.card'),t=a&&a.querySelector('textarea'),ek=t?t.value.trim():'';await gonder(r,m,{note:'Hayır: '+b.dataset.neden.toLocaleLowerCase('tr')+(ek?'. '+ek:''),ret:b.dataset.neden,sinif:'ret'});return}
     if(b.dataset.geri){if(!db)return;try{await db.doc('cevap/'+b.dataset.geri).delete();setStatus('geri alındı','ok');cevapDosyasiPlanla()}catch(_){setStatus('geri alınamadı','uyari')}return}
@@ -355,7 +355,7 @@ body.odak-kip #sorular .card.odak-bu{box-shadow:0 10px 40px rgba(0,0,0,.08)}
   $('paletGir').addEventListener('keydown',e=>{if(e.key==='ArrowDown'){e.preventDefault();paletSec=Math.min(paletL.length-1,paletSec+1);paletCiz()}else if(e.key==='ArrowUp'){e.preventDefault();paletSec=Math.max(0,paletSec-1);paletCiz()}else if(e.key==='Enter'){e.preventDefault();const x=paletL[paletSec];if(x){paletKapat();x.f()}}else if(e.key==='Escape'){e.preventDefault();e.stopPropagation();paletKapat()}});
   $('paletListe').addEventListener('click',e=>{const li=e.target.closest('li[data-i]');if(li){const x=paletL[+li.dataset.i];paletKapat();x&&x.f()}});
   $('paletOrtu').addEventListener('click',e=>{if(e.target===$('paletOrtu'))paletKapat()});
-  function soruyaGit(k){ const rid=k.split('__')[0];if(kucuk[rid]){delete kucuk[rid];yerel('merkez-kucuk',JSON.stringify(kucuk))} sekme='sorular';suz='hepsi';defterSec='';$('defterSec').value='';ciz();requestAnimationFrame(()=>{const a=document.querySelector(`#sorular .card[data-c="${CSS.escape(k)}"]`);if(!a)return;document.querySelectorAll('.card.kfocus').forEach(c=>c.classList.remove('kfocus'));a.classList.add('kfocus');a.scrollIntoView({block:'start'});odak=[...document.querySelectorAll('#sorular .card')].indexOf(a)})}
+  function soruyaGit(k){ const rid=k.split('__')[0];if(kucuk[rid]){delete kucuk[rid];yerel('merkez-kucuk',JSON.stringify(kucuk))} sekme='sorular';suz='hepsi';defterSec='';$('defterSec').value='';ciz();requestAnimationFrame(()=>{const a=document.querySelector(`#sorular .card[data-c="${window.CSS.escape(k)}"]`);if(!a)return;document.querySelectorAll('.card.kfocus').forEach(c=>c.classList.remove('kfocus'));a.classList.add('kfocus');a.scrollIntoView({block:'start'});odak=[...document.querySelectorAll('#sorular .card')].indexOf(a)})}
   // ── klavye
   const yaziyor=()=>{const a=document.activeElement;return a&&(a.tagName==='TEXTAREA'||(a.tagName==='INPUT'&&!['radio','checkbox'].includes(a.type))||a.isContentEditable)};
   document.addEventListener('keydown',e=>{

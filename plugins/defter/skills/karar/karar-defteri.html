@@ -832,6 +832,7 @@ body{overflow-wrap:break-word}.steps li{grid-template-columns:auto auto minmax(0
     if(gomulu)return ic;
     return Object.assign({items:[]},ic,{_veriYok:true})})();
   const P={1:'Acil',2:'Önemli',3:'Sonra'}, T={design:'✎ kararın',tech:'⚙ teknik',info:'ⓘ bilgi',report:'▤ rapor',task:'☐ görev'};
+  const oncelikAd=k=>P[k], turEtiket=k=>T[k]||k, baslikKisa=()=>D.title.split(';')[0];   // şablon metninde büyük harfle başlayan yer tutucu yok: Dizin tarayıcısı onu ortam değişkeni sanıyor
   const FT={all:['Hepsi','Bütün maddeler'],design:['✎ Kararın','Senin vereceğin kararlar: tasarım, marka, para, hukuk, kullanıcıya görünen metin'],tech:['⚙ Teknik','Ajanın verdiği teknik kararlar; itiraz kutusu, boş bırakırsan kabul'],info:['ⓘ Bilgi','Şunu bil maddeleri; okuyup Tamamla'],report:['▤ Rapor','Araştırma bulguları ve metinler; oku, sorunu yaz, Okudum'],task:['☐ Görev','Senin dışarıda yapacağın işler: adım adım, ne getireceğin yazılı']};
   const state={}; let lastOpen=[]; let prevOpen=[]; let db=null, filter='all', onlyUrgent=false; const timers=new Map(); const pins={};
   const $=id=>document.getElementById(id);
@@ -936,14 +937,14 @@ body{overflow-wrap:break-word}.steps li{grid-template-columns:auto auto minmax(0
   window.addEventListener('pagehide',bosalt);
   // ── yardımcılar
   const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-  const KOPYA='<button type="button" class="kopyala" data-kopyala title="Kopyala" aria-label="Kopyala"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="5.5" y="5.5" width="8.5" height="8.5" rx="1.5"/><path d="M10.5 5.5V3.5a1.5 1.5 0 0 0-1.5-1.5H3.5A1.5 1.5 0 0 0 2 3.5V9a1.5 1.5 0 0 0 1.5 1.5h2"/></svg></button>';
+  const kopyaSvg='<button type="button" class="kopyala" data-kopyala title="Kopyala" aria-label="Kopyala"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="5.5" y="5.5" width="8.5" height="8.5" rx="1.5"/><path d="M10.5 5.5V3.5a1.5 1.5 0 0 0-1.5-1.5H3.5A1.5 1.5 0 0 0 2 3.5V9a1.5 1.5 0 0 0 1.5 1.5h2"/></svg></button>';
   async function kopyala(b){const h=b.previousElementSibling;const t=h?h.textContent:'';let ok=false;
     try{await navigator.clipboard.writeText(t);ok=true}catch(e){try{const ta=document.createElement('textarea');ta.value=t;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();ok=document.execCommand('copy');ta.remove()}catch(_){}}
     b.classList.toggle('tamam',ok);setStatus(ok?'kopyalandı: '+(t.length>40?t.slice(0,40)+'…':t):'kopyalanamadı; elle seç','ok');setTimeout(()=>b.classList.remove('tamam'),1600)}
   // ```mesaj Site ajanına  -> gönderilecek mesaj kutusu (düz yazı, satır kaydırır, kopyala); ``` -> kod bloğu
   function kodBlok(satirlar,k){const ic=esc(satirlar.join('\n'));
-    if(k&&k.tur==='mesaj')return '<div class="mesaj-bas">→ '+(k.hedef?inlTek(k.hedef):'Gönderilecek mesaj')+'</div><div class="kod-sar"><pre class="mesaj">'+ic+'</pre>'+KOPYA+'</div>';
-    return '<div class="kod-sar"><pre class="kod"><code>'+ic+'</code></pre>'+KOPYA+'</div>'}
+    if(k&&k.tur==='mesaj')return '<div class="mesaj-bas">→ '+(k.hedef?inlTek(k.hedef):'Gönderilecek mesaj')+'</div><div class="kod-sar"><pre class="mesaj">'+ic+'</pre>'+kopyaSvg+'</div>';
+    return '<div class="kod-sar"><pre class="kod"><code>'+ic+'</code></pre>'+kopyaSvg+'</div>'}
   const inlTek=x=>esc(x).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>');
   function md(t){ // hoşgörülü biçimleyici: paragraf, başlık (#..####), - * 1. listeler (iç içe), | tablo |, > alıntı, ---, **kalın**, *italik*, `kod`, [bağlantı](https://)
     const out=[];let p=[],liste=null,tablo=null,alinti=[],kod=null,kodTur={};
@@ -972,16 +973,16 @@ body{overflow-wrap:break-word}.steps li{grid-template-columns:auto auto minmax(0
     });
     kapaHepsi();if(kod!==null)out.push(kodBlok(kod,kodTur));
     return out.join('');
-    function listeHtml(L){
-      let h='<'+L.tur+'>',acik=null;
-      L.ic.forEach((x,k)=>{
+    function listeHtml(lst){
+      let h='<'+lst.tur+'>',acik=null;
+      lst.ic.forEach((x,k)=>{
         if(x.derin&&!acik){acik=x.tur;h=h.replace(/<\/li>$/,'')+'<'+acik+'>'}
         if(!x.derin&&acik){h+='</'+acik+'></li>';acik=null}
-        h+='<li>'+inl(x.metin)+(x.derin||(L.ic[k+1]&&L.ic[k+1].derin)?'':'</li>');
+        h+='<li>'+inl(x.metin)+(x.derin||(lst.ic[k+1]&&lst.ic[k+1].derin)?'':'</li>');
         if(x.derin)h+='</li>';
       });
       if(acik)h+='</'+acik+'></li>';
-      return h+'</'+L.tur+'>';
+      return h+'</'+lst.tur+'>';
     }
     function tabloHtml(lines){
       const sat=lines.map(l=>l.trim().replace(/^\|/,'').replace(/\|$/,'').split('|').map(c=>c.trim()));
@@ -1000,7 +1001,7 @@ body{overflow-wrap:break-word}.steps li{grid-template-columns:auto auto minmax(0
       .replace(/\*\*(.+?)\*\*/g,'<b>$1</b>')
       .replace(/(^|[\s(])\*(?!\s)([^*\n]+?)\*(?=[\s.,;:!?)]|$)/g,'$1<em>$2</em>')
       .replace(/(^|[\s(])_(?!\s)([^_\n]+?)_(?=[\s.,;:!?)]|$)/g,'$1<em>$2</em>')
-      .replace(/\u0000(\d+)\u0000/g,(m,i)=>{const k=kodlar[+i];return '<code>'+k+'</code>'+(k.length>=6?KOPYA:'')})}
+      .replace(/\u0000(\d+)\u0000/g,(m,i)=>{const k=kodlar[+i];return '<code>'+k+'</code>'+(k.length>=6?kopyaSvg:'')})}
   }
   const mdSatir=t=>md(t).replace(/^<p>([\s\S]*)<\/p>$/,'$1'); // tek paragraflık alanlar için sarmalayıcısız
   function editing(){const a=document.activeElement;if(!a)return false;if(a.isContentEditable||a.tagName==='TEXTAREA')return true;
@@ -1069,10 +1070,10 @@ body{overflow-wrap:break-word}.steps li{grid-template-columns:auto auto minmax(0
   function stepHtml(it,st,i,checked){
     const box=`<input type="checkbox" data-step="${it.id}" data-i="${i}" aria-label="Adım ${i+1}" ${checked?'checked':''}>`;
     if(typeof st==='string')return `<li>${box}<span class="plain">${mdSatir(st)}</span></li>`;
-    const L=[['go','Git'],['do','Yap'],['see','Bak'],['keep','Kaydet']].filter(([k])=>st[k]).map(([k,l])=>`<div class="sl ${k}"><b>${l}</b><span>${mdSatir(st[k])}</span></div>`).join('');
-    return `<li>${box}${L}</li>`;
+    const lst=[['go','Git'],['do','Yap'],['see','Bak'],['keep','Kaydet']].filter(([k])=>st[k]).map(([k,l])=>`<div class="sl ${k}"><b>${l}</b><span>${mdSatir(st[k])}</span></div>`).join('');
+    return `<li>${box}${lst}</li>`;
   }
-  const RISK={dis:['dışa dönük','Yayın, e-posta, ödeme gibi dışarıya giden iş; dikkat'],icerik:['içerik','Görünen metin ya da görsel'],geri:['geri alınır','Kolayca geri alınabilir'],donulmez:['geri dönülmez','Geri alması zor: baskı, sözleşme, yayın; önce buna bak']};
+  const riskAd={dis:['dışa dönük','Yayın, e-posta, ödeme gibi dışarıya giden iş; dikkat'],icerik:['içerik','Görünen metin ya da görsel'],geri:['geri alınır','Kolayca geri alınabilir'],donulmez:['geri dönülmez','Geri alması zor: baskı, sözleşme, yayın; önce buna bak']};
   const baslik=t=>String(t||'').replace(/^[✎⚙ⓘ▤☐]\s*/,'');
   const acildiT=it=>new Date(/T/.test(String(it.acildi))?it.acildi:it.acildi+'T00:00:00');
   const bekledi=it=>{if(!it.acildi)return 0;const g=(Date.now()-acildiT(it))/864e5;return g>=1?Math.floor(g):0};
@@ -1080,7 +1081,7 @@ body{overflow-wrap:break-word}.steps li{grid-template-columns:auto auto minmax(0
   const yerineGecen=id=>D.items.find(x=>x.yerine===id&&x.id!==id);
   const riskli=it=>!!it&&(it.risk==='dis'||it.risk==='donulmez');
   const secimSart=it=>!!it&&(it.priority===1||riskli(it))&&(it.options||[]).length>0;
-  const IKON_EK='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8.5 12.5l5.8-5.8a3 3 0 0 1 4.2 4.2l-7.4 7.4a4.6 4.6 0 0 1-6.5-6.5l6.9-6.9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
+  const ikonEk='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8.5 12.5l5.8-5.8a3 3 0 0 1 4.2 4.2l-7.4 7.4a4.6 4.6 0 0 1-6.5-6.5l6.9-6.9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
   const gorAnahtar='kd-gor-'+D.id;let gor={};try{gor=JSON.parse(localStorage.getItem(gorAnahtar)||'{}')}catch(_){}
   const ilkZiyaret=!Object.keys(gor).length;
   const maddeOzet=it=>{const t=JSON.stringify([it.title,it.why,it.body,it.options,it.steps,it.degisti,it.yanitlar]);let h=0;for(let i=0;i<t.length;i++)h=(h*31+t.charCodeAt(i))|0;return h};
@@ -1100,28 +1101,28 @@ body{overflow-wrap:break-word}.steps li{grid-template-columns:auto auto minmax(0
     const kararSatir=(s.choice&&secimEtiket(it,s.choice)?`<b>${esc(secimEtiket(it,s.choice))}</b>`:'')+(s.note?(s.choice?' · ':'')+`<span>${esc(s.note)}</span>`:'');
     const ans=done?`<div class="answer"><div class="karar-kart">${kararSatir?`<div><span class="kk-e">Karar</span> ${kararSatir}</div>`:''}${it.sonuc?`<div><span class="kk-e">Sonuç</span> ${mdSatir(it.sonuc)}</div>`:''}${s.gerekce?`<div><span class="kk-e">Gerekçe</span> ${esc(s.gerekce)}</div>`:''}</div>${dosyaNotlari(it.id,s).length?`<div class="ek-notlar"><b>Dosya notları</b><ul>${dosyaNotlari(it.id,s).map(n=>`<li>${esc(n.ad)}: ${esc(n.not)}</li>`).join('')}</ul></div>`:''}${!secimEtiket(it,s.choice||'')&&!s.note?'<i>'+(isText(it)?'okundu':(it.type==='tech'?'kabul edildi, itiraz yok':'cevapsız tamamlandı'))+'</i>':''}</div>`:'';
     const saat=done&&s.doneAt?(Date.now()-new Date(s.doneAt))/36e5:99,taslak=done&&!s.kesin&&saat<24,yg=done&&yerineGecen(it.id);
-    const durumPill=!done?'':(yg?`<span class="pill durum-yerine" title="${esc(yg.id)} bunun yerine geçti">yerine geçti · ${esc(yg.id)}</span>`:(taslak?`<span class="pill durum-taslak" title="24 saat taslak: fikrin değişirse Geri aç; sonra kesinleşir">taslak · ${Math.max(1,Math.ceil(24-saat))} sa</span>`:'<span class="pill durum-kesin">kesin</span>'))+(s.kaynak==='merkez'?'<span class="pill merkezden" title="Defter Merkezi\'nden cevaplandı">Merkez\'den</span>':'');
+    const durumPill=!done?'':(yg?`<span class="pill durum-yerine" title="${esc(yg.id)} bunun yerine geçti">yerine geçti · ${esc(yg.id)}</span>`:(taslak?`<span class="pill durum-taslak" title="24 saat taslak: fikrin değişirse Geri aç; sonra kesinleşir">taslak · ${window.Math.max(1,Math.ceil(24-saat))} sa</span>`:'<span class="pill durum-kesin">kesin</span>'))+(s.kaynak==='merkez'?'<span class="pill merkezden" title="Defter Merkezi\'nden cevaplandı">Merkez\'den</span>':'');
     const oneriyle=!done&&it.recv&&!it.coklu&&!s.choice&&!s.note&&(it.options||[]).length&&!secimSart(it);
     const text=isText(it); const pinned=pins[it.id]!==undefined?pins[it.id]:text;
     const doneLabel=text?'Okudum':'Tamamla';
     const dahaHtml=done?'':`<details class="daha"><summary aria-label="Daha fazla" title="Daha fazla">⋯</summary><div class="daha-menu" role="menu"><button type="button" role="menuitem" data-later="${it.id}">Sona at<small>listenin sonuna gider</small></button><button type="button" role="menuitem" data-gorsel-ekle="${it.id}">Dosya ekle<small>görsel, video, PDF</small></button><button type="button" role="menuitem" data-gerekce-ac="${it.id}">Gerekçe yaz<small>neden böyle karar verdim</small></button>${text?`<button type="button" role="menuitem" data-pin="${it.id}" aria-pressed="${pinned}">Notu sabitle<small>okurken not kutusu altta dursun</small></button>`:''}${text&&window.speechSynthesis?`<button type="button" role="menuitem" class="dinle" data-dinle="${it.id}">Dinle</button>`:''}${it.due?`<a role="menuitem" href="${takvimUrl(it)}" target="_blank" rel="noopener">📅 Takvime ekle</a>`:''}${it._mine?'':`<button type="button" role="menuitem" data-gereksiz="${it.id}">Bu soru gereksizdi<small>ajan bu türü bir daha sormaz, kendisi karar verir</small></button>`}<button type="button" role="menuitem" data-bag="${it.id}">Bağlantıyı kopyala<small>bu maddeye doğrudan açılır</small></button>${!db&&!it._mine?`<button type="button" role="menuitem" data-gonder="${it.id}">Claude'a gönder<small>cevabı kopyalar</small></button>`:''}</div></details>`;
     const ph=it.type==='tech'?'Tamam / itiraz':(it.type==='task'?'Sonuç: dosya yolu, bağlantı, takıldığın yer':(text?'Metne dair soruların, notların':'Not'));
     return `<article class="card ${it.priority===1&&!done?'urgent':''} ${done?'done':''} ${done&&s.teyit?'teyitli':''} ${pinned&&!done?'pin':''} ${it._mine?'mine':''} ${s.collapsed&&!done?'min':''}" data-id="${it.id}">
-      <div class="head">${done?'':`<span class="ctl"><button class="min-btn" data-min="${it.id}" title="${s.collapsed?'Aç':'Küçült (devam ediyor)'}" aria-expanded="${!s.collapsed}">${s.collapsed?'▸':'▾'}</button><span class="drag" data-drag="${it.id}" title="Sürükleyip sırala">≡</span></span>`}${!done?`<input type="checkbox" class="toplu-sec" data-toplu="${it.id}" aria-label="${it.id} seç" ${topluSecili.has(it.id)?'checked':''}>`:''}<span class="id">${it.id}</span><h3 class="title">${esc(baslik(it.title))}</h3>${durumPill}${!done&&bekledi(it)?`<span class="pill bekleme" title="Bu madde ${bekledi(it)} gündür cevap bekliyor">${bekledi(it)} gündür</span>`:''}${!done&&yeniMi(it)?`<span class="pill yeni">${yeniMi(it)==='yeni'?'yeni':'değişti'}</span>`:''}${it.risk&&RISK[it.risk]?`<span class="pill risk r-${it.risk}" title="${RISK[it.risk][1]}">${RISK[it.risk][0]}</span>`:''}<span class="pill p${it.priority}">${P[it.priority]}</span>${it._mine?'<span class="pill design">senden</span>':`<span class="pill ${it.type==='design'?'design':(it.type==='task'?'task':'')}" title="${esc((FT[it.type]||['',''])[1])}">${T[it.type]||it.type}</span>`}${s.collapsed&&!done?'<span class="pill going">devam ediyor</span>':''}${s.later&&!done?'<span class="pill sonra" title="Listenin sonuna atıldı">sonraya atıldı</span>':''}${it.due&&!done?`<span class="pill due" title="Termin">⏱ ${esc(fmtDue(it.due))}</span>`:''}${dahaHtml}</div>
+      <div class="head">${done?'':`<span class="ctl"><button class="min-btn" data-min="${it.id}" title="${s.collapsed?'Aç':'Küçült (devam ediyor)'}" aria-expanded="${!s.collapsed}">${s.collapsed?'▸':'▾'}</button><span class="drag" data-drag="${it.id}" title="Sürükleyip sırala">≡</span></span>`}${!done?`<input type="checkbox" class="toplu-sec" data-toplu="${it.id}" aria-label="${it.id} seç" ${topluSecili.has(it.id)?'checked':''}>`:''}<span class="id">${it.id}</span><h3 class="title">${esc(baslik(it.title))}</h3>${durumPill}${!done&&bekledi(it)?`<span class="pill bekleme" title="Bu madde ${bekledi(it)} gündür cevap bekliyor">${bekledi(it)} gündür</span>`:''}${!done&&yeniMi(it)?`<span class="pill yeni">${yeniMi(it)==='yeni'?'yeni':'değişti'}</span>`:''}${it.risk&&riskAd[it.risk]?`<span class="pill risk r-${it.risk}" title="${riskAd[it.risk][1]}">${riskAd[it.risk][0]}</span>`:''}<span class="pill p${it.priority}">${oncelikAd(it.priority)}</span>${it._mine?'<span class="pill design">senden</span>':`<span class="pill ${it.type==='design'?'design':(it.type==='task'?'task':'')}" title="${esc((FT[it.type]||['',''])[1])}">${turEtiket(it.type)}</span>`}${s.collapsed&&!done?'<span class="pill going">devam ediyor</span>':''}${s.later&&!done?'<span class="pill sonra" title="Listenin sonuna atıldı">sonraya atıldı</span>':''}${it.due&&!done?`<span class="pill due" title="Termin">⏱ ${esc(fmtDue(it.due))}</span>`:''}${dahaHtml}</div>
       ${it.daci?`<p class="daci">${[['karar','Karar veren'],['danis','Danışılan'],['haber','Haber verilen']].filter(([k])=>it.daci[k]).map(([k,l])=>`${l}: <b>${esc(it.daci[k])}</b>`).join(' · ')}</p>`:''}${it.yerine?`<p class="zincir">Bu madde <b>${esc(it.yerine)}</b> kararının yerine geçer.</p>`:''}
       ${done&&(it.ekler||[]).length?`<div class="gorseller">${ekSerit(it)}</div>`:''}
       ${(it.docs||[]).length?`<div class="docs">${it.docs.map(d=>`<span class="doc">${esc(d)}</span>`).join('')}</div>`:''}
       ${done?ans+((s.history||[]).length?`<div class="hist">Önceki cevap: ${esc((s.history.at(-1).choice?((it.options||[]).find(o=>o.v===s.history.at(-1).choice)?.t||s.history.at(-1).choice)+' ':'')+(s.history.at(-1).note||''))}</div>`:''):`
-      ${ayar.onerimAcik&&it.rec&&!done?`<div class="rec acik${String(it.rec).length>240?' uzun':''}" ${String(it.rec).length>240?'title="Devamı için dokun"':''}><b>Önerim:</b> ${mdSatir(it.rec)}</div>`:''}
+      ${ayar.onerimAcik&&it.rec&&!done?`<div class="rec acik${window.String(it.rec).length>240?' uzun':''}" ${window.String(it.rec).length>240?'title="Devamı için dokun"':''}><b>Önerim:</b> ${mdSatir(it.rec)}</div>`:''}
       ${it.why?`<details class="why"><summary>Neden soruyorum</summary><div class="why-in">${md(it.why)}</div>${it.rec&&!ayar.onerimAcik?`<div class="rec"><b>Önerim:</b> ${mdSatir(it.rec)}</div>`:''}</details>`:(it.rec&&!ayar.onerimAcik?`<div class="rec"><b>Önerim:</b> ${mdSatir(it.rec)}</div>`:'')}
       ${it.dene&&!done?`<div class="dene"><span class="rozet">dene</span><span>Seçeneği işaretle; sayfa hemen o hâle geçer, sonra Tamamla.</span></div>`:''}
       ${text?`<div class="body ${ayar.raporKatla&&!acikRapor.has(it.id)&&!done?'katla':''}">${md(it.body)}</div>${ayar.raporKatla&&!done?`<button class="devam" data-devam="${it.id}">${acikRapor.has(it.id)?'Daralt':'Devamını oku'}</button>`:''}`:''}
       ${!done&&it.degisti&&yeniMi(it)==='degisti'?`<div class="degisti-satir"><b>Değişti:</b> ${mdSatir(it.degisti)}</div>`:''}
-      ${Array.isArray(it.karsilastir)&&it.karsilastir.length===2?karsiHtml(it.karsilastir):''}
+      ${window.Array.isArray(it.karsilastir)&&it.karsilastir.length===2?karsiHtml(it.karsilastir):''}
       ${steps?`<ol class="steps">${steps}</ol>`:''}${it.deliver?`<div class="deliver"><b>Bana getireceğin:</b> ${mdSatir(it.deliver)}</div>`:''}
       ${opts?`<div class="opts" role="radiogroup" aria-label="${esc(it.title)}">${opts}</div>`:''}
       ${soruHtml(it,s)}
-      <div class="notewrap"><div class="not-sar"><textarea id="note-${it.id}" data-note="${it.id}" rows="1" aria-label="Not: ${esc(it.title)}" placeholder="${ph}">${esc(s.note||'')}</textarea><button type="button" class="ek-btn" data-gorsel-ekle="${it.id}" title="Dosya ekle: görsel, video, PDF (kartın üstüne sürükleyip de bırakabilirsin; ekran görüntüsünü yapıştırabilirsin)" aria-label="Dosya ekle">${IKON_EK}</button><button type="button" class="dikte" data-dikte="note-${it.id}" title="Sesle yaz" aria-label="Sesle yaz">🎙</button></div>
+      <div class="notewrap"><div class="not-sar"><textarea id="note-${it.id}" data-note="${it.id}" rows="1" aria-label="Not: ${esc(it.title)}" placeholder="${ph}">${esc(s.note||'')}</textarea><button type="button" class="ek-btn" data-gorsel-ekle="${it.id}" title="Dosya ekle: görsel, video, PDF (kartın üstüne sürükleyip de bırakabilirsin; ekran görüntüsünü yapıştırabilirsin)" aria-label="Dosya ekle">${ikonEk}</button><button type="button" class="dikte" data-dikte="note-${it.id}" title="Sesle yaz" aria-label="Sesle yaz">🎙</button></div>
       <div class="gerekce-sar" ${s.gerekce?'':'hidden'}><input data-gerekce="${it.id}" value="${esc(s.gerekce||'')}" placeholder="Neden böyle karar verdim (isteğe bağlı; aylar sonra tez ya da ekip için kalır)" aria-label="Gerekçe"></div>
       <div class="gorseller">${ekSerit(it)}${(s.gorseller||[]).map((g,i)=>`<span class="gorsel-sar">${gorselKutu(it.id,g,i)}<button type="button" class="gorsel-sil" data-gorsel-sil="${it.id}" data-i="${i}" title="Kaldır" aria-label="Kaldır">✕</button></span>`).join('')}</div>`}
       ${done&&it.onay?`<div class="teyit-satir ${s.teyit?'tamam':''}"><span>${s.teyit?'Teyit edildi':'Teyit bekliyor'}: <b>${esc(it.onay)}</b>${s.teyit?' · '+esc(String(s.teyit).slice(0,10)):''}</span><button type="button" class="hz kucuk" data-teyit="${it.id}">${s.teyit?'Geri al':'Teyit edildi'}</button></div>`:''}
@@ -1131,19 +1132,19 @@ body{overflow-wrap:break-word}.steps li{grid-template-columns:auto auto minmax(0
   // ── ekler ve medya listesi
   const medyaTuru=u=>{if(/^https?:\/\//i.test(String(u||'')))return'baglanti';const x=String(u||'').split(/[?#]/)[0].toLowerCase();if(/\.pdf$/.test(x))return'pdf';if(/\.html?$/.test(x))return'html';if(/\.(md|markdown|txt)$/.test(x))return'metin';if(/\.(mp4|webm|mov|m4v|ogv)$/.test(x))return'video';if(/\.(jpe?g|png|gif|webp|avif|svg|bmp)$/.test(x)||!/\.[a-z0-9]{2,5}$/.test(x))return'resim';return'dosya'};
   const turu=g=>(g&&g.tur)||medyaTuru(g&&g.url);
-  const TUR_AD={pdf:'PDF',html:'Sayfa',video:'Video',resim:'Görsel',metin:'Metin',baglanti:'Bağlantı',dosya:'Dosya',paket:'Paket'};
-  const gorselAdi=(g,i)=>g.ad||g.alt||((turu(g)==='video'?'Video ':(turu(g)==='resim'?'Görsel ':TUR_AD[turu(g)]+' '))+(i+1));
+  const turAd={pdf:'PDF',html:'Sayfa',video:'Video',resim:'Görsel',metin:'Metin',baglanti:'Bağlantı',dosya:'Dosya',paket:'Paket'};
+  const gorselAdi=(g,i)=>g.ad||g.alt||((turu(g)==='video'?'Video ':(turu(g)==='resim'?'Görsel ':turAd[turu(g)]+' '))+(i+1));
   const ekNotu=(id,j)=>(((state[id]||{}).ekNot)||{})[j]||'';
   const kapakAni=u=>{let h=0;for(const c of String(u))h=(h*31+c.charCodeAt(0))>>>0;return .15+(h%1000)/1000*.7};
   const dosyaAdi=u=>{try{return decodeURIComponent(String(u).split(/[?#]/)[0].split('/').pop())}catch(e){return String(u)}};
   function ekSerit(it){return (it.ekler||[]).map((e,j)=>{const tr=turu(e),ad=e.ad||dosyaAdi(e.url),nt=ekNotu(it.id,j)?' notlu':'';
-    if(tr==='baglanti')return `<button type="button" class="gorsel ek${nt}" data-ek-ac="${it.id}" data-j="${j}" title="${esc(ad)}" aria-label="Bağlantı: ${esc(ad)}, aç"><b>${TUR_AD[tr]}</b><span>${esc(ad)}</span></button>`;
+    if(tr==='baglanti')return `<button type="button" class="gorsel ek${nt}" data-ek-ac="${it.id}" data-j="${j}" title="${esc(ad)}" aria-label="Bağlantı: ${esc(ad)}, aç"><b>${turAd[tr]}</b><span>${esc(ad)}</span></button>`;
     if(tr==='resim')return `<button type="button" class="gorsel${nt}" data-ek-ac="${it.id}" data-j="${j}" title="${esc(ad)}" aria-label="${esc(ad)}, aç"><img src="${esc(e.url)}" alt=""></button>`;
     if(tr==='video')return `<button type="button" class="gorsel${nt}" data-ek-ac="${it.id}" data-j="${j}" title="${esc(ad)}" aria-label="Video: ${esc(ad)}, aç"><video src="${esc(e.url)}" data-kapak muted preload="metadata" playsinline></video><span class="oynat">▶</span></button>`;
-    return `<button type="button" class="gorsel ek${nt}" data-ek-ac="${it.id}" data-j="${j}" title="${esc(ad)}" aria-label="${TUR_AD[tr]}: ${esc(ad)}, aç"><b>${TUR_AD[tr]}</b><span>${esc(ad)}</span></button>`}).join('')}
+    return `<button type="button" class="gorsel ek${nt}" data-ek-ac="${it.id}" data-j="${j}" title="${esc(ad)}" aria-label="${turAd[tr]}: ${esc(ad)}, aç"><b>${turAd[tr]}</b><span>${esc(ad)}</span></button>`}).join('')}
   function gorselKutu(id,g,i){const tr=turu(g),ad=gorselAdi(g,i),nt=g.not?' notlu':'';
     if(tr==='video')return `<button type="button" class="gorsel${nt}" data-gorsel-ac="${id}" data-i="${i}" title="${esc(ad)}" aria-label="${esc(ad)}, aç"><video src="${esc(g.url)}" data-kapak muted preload="metadata" playsinline></video><span class="oynat">▶</span>${g.ornek?'<span class="im" style="background:var(--going);color:var(--going-ink)">örnek</span>':''}</button>`;
-    if(tr==='pdf'||tr==='html'||tr==='metin'||tr==='dosya')return `<button type="button" class="gorsel ek${nt}" data-gorsel-ac="${id}" data-i="${i}" title="${esc(ad)}" aria-label="${esc(ad)}, aç"><b>${TUR_AD[tr]}</b><span>${esc(ad)}</span></button>`;
+    if(tr==='pdf'||tr==='html'||tr==='metin'||tr==='dosya')return `<button type="button" class="gorsel ek${nt}" data-gorsel-ac="${id}" data-i="${i}" title="${esc(ad)}" aria-label="${esc(ad)}, aç"><b>${turAd[tr]}</b><span>${esc(ad)}</span></button>`;
     return `<button type="button" class="gorsel${nt}" data-gorsel-ac="${id}" data-i="${i}" title="${esc(ad)}: büyüt ve üzerine çiz" aria-label="${esc(ad)}, büyüt ve üzerine çiz"><img src="${esc(g.url)}" alt="">${g.cizili?'<span class="im">çizili</span>':(g.ornek?'<span class="im" style="background:var(--going);color:var(--going-ink)">örnek</span>':'')}</button>`}
   function dosyaNotlari(id,d){const it=maddeBul(id)||{};d=d||state[id]||{};const l=[];
     (it.ekler||[]).forEach((e,j)=>{const n=((d.ekNot||{})[j]||'').trim();if(n)l.push({ad:e.ad||dosyaAdi(e.url),tur:turu(e),not:n})});
@@ -1213,7 +1214,7 @@ body{overflow-wrap:break-word}.steps li{grid-template-columns:auto auto minmax(0
     if(t.dataset.gerekce){const id=t.dataset.gerekce;state[id]=Object.assign({},state[id],{gerekce:t.value.trim()});sched(id);return}
     if(t.dataset.note&&!CSS.supports('field-sizing','content')){t.style.height='auto';t.style.height=Math.min(t.scrollHeight+2,innerHeight*.4)+'px'}
     if(t.dataset.step){const id=t.dataset.step;state[id]=state[id]||{};const a=(state[id].steps||[]).slice();a[+t.dataset.i]=t.checked;state[id].steps=a;sched(id);return}
-    const id=t.dataset.note||t.name;if(!id)return;state[id]=state[id]||{};if(t.dataset.note)state[id].note=t.value.trim();if(t.dataset.coklu){state[id].choice=[...document.querySelectorAll(`input[data-coklu="${CSS.escape(id)}"]:checked`)].map(x=>x.value);sched(id);return}if(t.type==='radio'){state[id].choice=t.value;const it=D.items.find(x=>x.id===id);if(it&&it.dene){sched(id);ayarUygula(it,t.value);return}}const s=document.querySelector(`[data-saved="${id}"]`);if(s)s.textContent='';sched(id)});
+    const id=t.dataset.note||t.name;if(!id)return;state[id]=state[id]||{};if(t.dataset.note)state[id].note=t.value.trim();if(t.dataset.coklu){state[id].choice=[...document.querySelectorAll(`input[data-coklu="${window.CSS.escape(id)}"]:checked`)].map(x=>x.value);sched(id);return}if(t.type==='radio'){state[id].choice=t.value;const it=D.items.find(x=>x.id===id);if(it&&it.dene){sched(id);ayarUygula(it,t.value);return}}const s=document.querySelector(`[data-saved="${id}"]`);if(s)s.textContent='';sched(id)});
   const notlar=()=>[...document.querySelectorAll('#panelOpen textarea[data-note]')];
   const kartlar=()=>[...document.querySelectorAll('#panelOpen .card')];
   function odakla(i){const k=kartlar();if(!k.length)return;odak=Math.max(0,Math.min(k.length-1,i));
@@ -1392,8 +1393,8 @@ body{overflow-wrap:break-word}.steps li{grid-template-columns:auto auto minmax(0
         } else {
           const tr=f.type==='application/pdf'?'pdf':(f.type.startsWith('video/')?'video':'resim');
           if(f.size>AZAMI_MB*1048576){setStatus(f.name+' '+Math.round(f.size/1048576)+' MB; sınır '+AZAMI_MB+' MB, kısaltıp ya da sıkıştırıp ekle','uyari');continue}
-          if(!varliklar){setStatus(TUR_AD[tr]+' yalnız bağlantılı defterde eklenir; bu tarayıcıda yalnız görsel','uyari');continue}
-          const v=await varliklar.upload(f);kayit={id:v.id,url:v.url,tur:tr,ad:(f.name||TUR_AD[tr]).replace(/\.[^.]+$/,'')};
+          if(!varliklar){setStatus(turAd[tr]+' yalnız bağlantılı defterde eklenir; bu tarayıcıda yalnız görsel','uyari');continue}
+          const v=await varliklar.upload(f);kayit={id:v.id,url:v.url,tur:tr,ad:(f.name||turAd[tr]).replace(/\.[^.]+$/,'')};
         }
         eski.push(kayit);
       }catch(e){setStatus('eklenemedi: '+(e&&(e.code||e.message)||''),'uyari');return}
@@ -1489,7 +1490,7 @@ body{overflow-wrap:break-word}.steps li{grid-template-columns:auto auto minmax(0
     const l=medya(id),n=tv.n;
     $('medyaSayac').textContent=l.length>1?(n+1)+' / '+l.length:'';
     const adOz=l[n]&&l[n].k==='g';const gir=$('medyaAdGir');gir.hidden=!adOz;if(adOz)gir.value=l[n].ad;
-    $('medyaAd').textContent=adOz?(l[n].tur!=='resim'?TUR_AD[l[n].tur]+':':''):((l[n]&&l[n].tur!=='resim'?TUR_AD[l[n].tur]+': ':'')+((l[n]&&l[n].ad)||''));
+    $('medyaAd').textContent=adOz?(l[n].tur!=='resim'?turAd[l[n].tur]+':':''):((l[n]&&l[n].tur!=='resim'?turAd[l[n].tur]+': ':'')+((l[n]&&l[n].ad)||''));
     document.querySelectorAll('.medya-ok').forEach(b=>b.hidden=l.length<2);
     const m=l[n]||{};
     $('kareBtn').hidden=!(kip==='video'||kip==='pdf'||kip==='gorsel');
@@ -1544,7 +1545,7 @@ body{overflow-wrap:break-word}.steps li{grid-template-columns:auto auto minmax(0
   }
   let pdfjsSoz=null;
   function pdfjs(){const kok='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/';
-    if(!pdfjsSoz)pdfjsSoz=import(kok+'pdf.min.mjs').then(m=>{m.GlobalWorkerOptions.workerSrc=kok+'pdf.worker.min.mjs';return m}).catch(e=>{pdfjsSoz=null;throw e});
+    if(!pdfjsSoz)pdfjsSoz=import('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.min.mjs').then(m=>{m.GlobalWorkerOptions.workerSrc=kok+'pdf.worker.min.mjs';return m}).catch(e=>{pdfjsSoz=null;throw e});
     return pdfjsSoz}
   const PDF_AZAMI=40;
   async function pdfGoster(url,k,no){
@@ -1895,13 +1896,13 @@ body{overflow-wrap:break-word}.steps li{grid-template-columns:auto auto minmax(0
   function hashGit(){let id='';try{id=decodeURIComponent((location.hash||'').slice(1))}catch(e){}if(id)maddeyeGit(id)}
   function maddeyeGit(id){const it=maddeBul(id);if(!it)return;
     setSekme(isDone(it)?'done':'open');if(odakKip)odakIdx=Math.max(0,lastOpen.indexOf(id));render();
-    requestAnimationFrame(()=>{const el=document.querySelector(`.card[data-id="${CSS.escape(id)}"]`);if(!el)return;document.querySelectorAll('.card.kfocus').forEach(c=>c.classList.remove('kfocus'));el.classList.add('kfocus');korumaSonu=Date.now()+1500;el.scrollIntoView({block:'start',behavior:yumusak()})})}
+    requestAnimationFrame(()=>{const el=document.querySelector(`.card[data-id="${window.CSS.escape(id)}"]`);if(!el)return;document.querySelectorAll('.card.kfocus').forEach(c=>c.classList.remove('kfocus'));el.classList.add('kfocus');korumaSonu=Date.now()+1500;el.scrollIntoView({block:'start',behavior:yumusak()})})}
   window.addEventListener('hashchange',hashGit);
   // ── odak modu: tek kart, bitince sıradaki
   let odakKip=false,odakIdx=0;try{odakKip=sessionStorage.getItem('kd-odak-'+D.id)==='1'}catch(e){}
   function odakKur(v){odakKip=!!v;try{sessionStorage.setItem('kd-odak-'+D.id,v?'1':'0')}catch(e){}document.body.classList.toggle('odak-kip',odakKip);$('odakBtn').setAttribute('aria-pressed',odakKip);if(odakKip)topluKur(false);render();if(odakKip)scrollTo({top:0})}
   function odakUygula(ids){document.body.classList.toggle('odak-kip',odakKip&&sekme==='open');$('odakBar').hidden=!(odakKip&&sekme==='open'&&ids.length);if(!odakKip)return;
-    odakIdx=Math.max(0,Math.min(ids.length-1,odakIdx));const kart=document.querySelector(`#open .card[data-id="${CSS.escape(ids[odakIdx]||'')}"]`);if(kart)kart.classList.add('odak-bu');
+    odakIdx=Math.max(0,Math.min(ids.length-1,odakIdx));const kart=document.querySelector(`#open .card[data-id="${window.CSS.escape(ids[odakIdx]||'')}"]`);if(kart)kart.classList.add('odak-bu');
     $('odakSayac').textContent=ids.length?(odakIdx+1)+' / '+ids.length:'';document.querySelector('[data-odak="-1"]').disabled=odakIdx<=0;document.querySelector('[data-odak="1"]').disabled=odakIdx>=ids.length-1}
   function odakGec(y){odakIdx+=y;render();scrollTo({top:0})}
   $('odakBtn').addEventListener('click',()=>odakKur(!odakKip));
@@ -1932,9 +1933,9 @@ body{overflow-wrap:break-word}.steps li{grid-template-columns:auto auto minmax(0
     return K.map(([t,tur,f])=>({t,tur,f}))}
   function paletListe(q){q=(q||'').trim().toLocaleLowerCase('tr');
     const maddeler=D.items.filter(it=>!it.resolved).concat(mine()).map(it=>({id:it.id,t:baslik(it.title),tur:isDone(it)?'bitti':'madde',f:()=>maddeyeGit(it.id)}));
-    const L=paletKomutlar().concat(maddeler);if(!q)return L.filter(x=>x.tur!=='bitti').slice(0,40);
+    const lst=paletKomutlar().concat(maddeler);if(!q)return lst.filter(x=>x.tur!=='bitti').slice(0,40);
     const puan=x=>{const a=((x.id||'')+' '+x.t).toLocaleLowerCase('tr');if((x.id||'').toLocaleLowerCase('tr')===q)return 0;if(a.startsWith(q))return 1;if(a.includes(' '+q))return 2;if(a.includes(q))return 3;const p=q.split(/\s+/);return p.every(w=>a.includes(w))?4:9};
-    return L.map(x=>[puan(x),x]).filter(([p])=>p<9).sort((a,b)=>a[0]-b[0]).map(([,x])=>x).slice(0,60)}
+    return lst.map(x=>[puan(x),x]).filter(([p])=>p<9).sort((a,b)=>a[0]-b[0]).map(([,x])=>x).slice(0,60)}
   function paletCiz(){paletL=paletListe($('paletGir').value);paletSec=Math.min(paletSec,Math.max(0,paletL.length-1));
     $('paletListe').innerHTML=paletL.map((x,i)=>`<li role="option" data-i="${i}" aria-selected="${i===paletSec}"><span class="tur">${x.tur==='komut'?'komut':x.tur==='sayfa'?'sayfa':x.tur==='bitti'?'bitti':'madde'}</span>${x.id?`<span class="pid">${esc(x.id)}</span>`:''}<span class="pt">${esc(x.t)}</span></li>`).join('')||'<li aria-disabled="true"><span class="pt">Eşleşen yok</span></li>';
     const s=$('paletListe').querySelector('[aria-selected="true"]');s&&s.scrollIntoView({block:'nearest'})}
@@ -1947,10 +1948,10 @@ body{overflow-wrap:break-word}.steps li{grid-template-columns:auto auto minmax(0
   $('paletListe').addEventListener('click',e=>{const li=e.target.closest('li[data-i]');if(li)paletCalis(+li.dataset.i)});
   $('paletOrtu').addEventListener('click',e=>{if(e.target===$('paletOrtu'))paletKapat()});
   // ── haftalık karar özeti: son yedi günde kapanan kararlar, md
-  function ozetMetni(){const sinir=Date.now()-7*864e5;const L=D.items.filter(it=>{const s=state[it.id]||{};return s.done&&s.doneAt&&new Date(s.doneAt)>=sinir}).sort((a,b)=>String(state[a.id].doneAt).localeCompare(String(state[b.id].doneAt)));
+  function ozetMetni(){const sinir=Date.now()-7*864e5;const lst=D.items.filter(it=>{const s=state[it.id]||{};return s.done&&s.doneAt&&new Date(s.doneAt)>=sinir}).sort((a,b)=>String(state[a.id].doneAt).localeCompare(String(state[b.id].doneAt)));
     const g=t=>new Date(t).toLocaleDateString('tr-TR',{day:'numeric',month:'long'});const hucre=x=>String(x||'').replace(/\|/g,'/').replace(/\s+/g,' ').trim();
-    const sat=L.map(it=>{const s=state[it.id];return `| ${it.id} | ${hucre(baslik(it.title))} | ${hucre([secimEtiket(it,s.choice||''),s.note].filter(Boolean).join('; ')||'tamam')} | ${hucre(s.gerekce||'')} | ${g(s.doneAt)} |`});
-    return `# ${D.title.split(';')[0]}: haftalık karar özeti\n\n${g(sinir)} ile ${g(Date.now())} arası, ${L.length} karar.\n\n`+(L.length?`| Madde | Konu | Karar | Gerekçe | Tarih |\n| --- | --- | --- | --- | --- |\n${sat.join('\n')}\n`:'Bu hafta kapanan karar yok.\n')}
+    const sat=lst.map(it=>{const s=state[it.id];return `| ${it.id} | ${hucre(baslik(it.title))} | ${hucre([secimEtiket(it,s.choice||''),s.note].filter(Boolean).join('; ')||'tamam')} | ${hucre(s.gerekce||'')} | ${g(s.doneAt)} |`});
+    return `# ${baslikKisa()}: haftalık karar özeti\n\n${g(sinir)} ile ${g(Date.now())} arası, ${lst.length} karar.\n\n`+(lst.length?`| Madde | Konu | Karar | Gerekçe | Tarih |\n| --- | --- | --- | --- | --- |\n${sat.join('\n')}\n`:'Bu hafta kapanan karar yok.\n')}
   function ozetAc(){menuAc(false);$('ozetMetin').textContent=ozetMetni();$('ozetOrtu').hidden=false}
   $('ozetBtn').addEventListener('click',ozetAc);$('yazdirBtn').addEventListener('click',()=>{menuAc(false);setTimeout(()=>window.print(),200)});
   $('ozetOrtu').addEventListener('click',async e=>{const b=e.target.closest('[data-ozet]');if(e.target===$('ozetOrtu')||(b&&b.dataset.ozet==='kapat')){$('ozetOrtu').hidden=true;return}if(!b)return;const t=$('ozetMetin').textContent;
@@ -1976,7 +1977,7 @@ body{overflow-wrap:break-word}.steps li{grid-template-columns:auto auto minmax(0
   if(D.butce)$('butceBilgi').textContent='Bu hafta ≈ '+D.butce+' · ';
 
   // ── 46: kaynak güven sınıfları, BibTeX ve RIS, yedek, ⋯ menüsünde klavye, uzun önerim
-  const GUVEN={hakemli:['hakemli dergi','Hakem denetiminden geçmiş dergi makalesi'],kitap:['akademik kitap','Akademik yayınevi ya da üniversite yayını'],tez:['tez','Yüksek lisans ya da doktora tezi'],rapor:['kurum raporu','Kamu kurumu, müze ya da vakıf raporu'],arsiv:['arşiv belgesi','Birincil kaynak: arşiv, katalog, belge'],basin:['basın','Gazete, dergi, blog: veri olur, dayanak olmaz']};
+  const guvenAd={hakemli:['hakemli dergi','Hakem denetiminden geçmiş dergi makalesi'],kitap:['akademik kitap','Akademik yayınevi ya da üniversite yayını'],tez:['tez','Yüksek lisans ya da doktora tezi'],rapor:['kurum raporu','Kamu kurumu, müze ya da vakıf raporu'],arsiv:['arşiv belgesi','Birincil kaynak: arşiv, katalog, belge'],basin:['basın','Gazete, dergi, blog: veri olur, dayanak olmaz']};
   const bibAnahtar=(k,i)=>((String(k.yazar||'kaynak').split(/[,;\s]/)[0]||'kaynak').normalize('NFD').replace(/[^\w]/g,'')+(k.yil||'')+'_'+(i+1));
   const bibTur=k=>({hakemli:'article',kitap:'book',tez:'phdthesis',rapor:'techreport'})[k.guven]||(k.dergi?'article':'misc');
   function bibtex(){return (D.kaynakca||[]).map((k,i)=>{const a=[['title',k.baslik],['author',String(k.yazar||'').replace(/\s*[;&]\s*/g,' and ')],['year',k.yil],['journal',k.dergi],['doi',k.doi],['url',k.url],['note',k.neden]].filter(([,v])=>v);
@@ -1986,7 +1987,7 @@ body{overflow-wrap:break-word}.steps li{grid-template-columns:auto auto minmax(0
   async function dosyaVer(ad,metin,tur){if(indirici){try{await indirici.save({filename:ad,data:new Blob([metin],{type:tur})});setStatus('indirildi: '+ad,'ok');return}catch(e){if(e&&e.code==='declined'){setStatus('indirme iptal edildi','uyari');return}}}
     try{await navigator.clipboard.writeText(metin);setStatus('bu görünümde indirilemiyor; içerik panoya kopyalandı','uyari')}catch(_){setStatus('indirilemedi','uyari')}}
   document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-kaynak-indir]');if(!b)return;const bib=b.dataset.kaynakIndir==='bib';dosyaVer((D.id||'kaynakca')+(bib?'.bib':'.ris'),bib?bibtex():ris(),bib?'application/x-bibtex':'application/x-research-info-systems')});
-  function yedekMetni(){const g=new Date().toISOString().slice(0,10);const sat=[`# ${D.title.split(';')[0]}: yedek (${g})`,'',D.purpose||'',''];
+  function yedekMetni(){const g=new Date().toISOString().slice(0,10);const sat=[`# ${baslikKisa()}: yedek (${g})`,'',D.purpose||'',''];
     D.items.concat(mine()).forEach(it=>{const s=state[it.id]||{};sat.push(`## ${it.id} ${baslik(it.title)}`,'',`Durum: ${s.done?'tamamlandı '+String(s.doneAt||'').slice(0,10):'açık'}`);
       if(s.choice)sat.push('Karar: '+secimEtiket(it,s.choice));if(s.note)sat.push('Not: '+s.note);if(s.gerekce)sat.push('Gerekçe: '+s.gerekce);if(it.rec)sat.push('Önerim: '+it.rec);
       dosyaNotlari(it.id).forEach(n=>sat.push('Dosya notu, '+n.ad+': '+n.not));(s.sorular||[]).forEach(q=>sat.push('Soru: '+q.q));sat.push('')});
@@ -2061,13 +2062,13 @@ body{overflow-wrap:break-word}.steps li{grid-template-columns:auto auto minmax(0
     const nav=document.querySelector('#menuOrtu nav'),sonra=nav.querySelector('[data-git="acil"]');
     ss.forEach((x,i)=>{const b=document.createElement('button');b.type='button';b.dataset.git='sayfa';b.dataset.sayfaId='s-'+x.id;b.className='menu-sayfa';b.innerHTML='<small>·</small><span>'+esc(x.ad)+'</span>';nav.insertBefore(b,sonra)})}
   const kunye=k=>(k.yazar||'[yazar]')+' ('+(k.yil||'t.y.')+'). '+(k.baslik||'')+'.'+(k.dergi?' '+k.dergi+'.':'')+(k.doi?' https://doi.org/'+k.doi:(k.url?' '+k.url:''));
-  function kaynakcaHtml(){const L=D.kaynakca,gr=[...new Set(L.map(k=>k.grup).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'tr'));
-    return `<div class="kaynak-arac"><input type="search" class="kaynak-ara" placeholder="Kaynaklarda ara" aria-label="Kaynaklarda ara"><select class="kaynak-grup" aria-label="Gruba göre"><option value="">Bütün gruplar (${L.length})</option>${gr.map(g=>`<option>${esc(g)}</option>`).join('')}</select>${L.some(k=>k.guven)?`<select class="kaynak-guven" aria-label="Güven sınıfına göre"><option value="">Bütün türler</option>${Object.entries(GUVEN).filter(([g])=>L.some(k=>k.guven===g)).map(([g,[a]])=>`<option value="${g}">${a}</option>`).join('')}</select>`:''}<button type="button" class="btn ghost" data-kaynak-indir="bib" title="Zotero, Mendeley ve Word için">BibTeX indir</button><button type="button" class="btn ghost" data-kaynak-indir="ris">RIS indir</button></div>
-    <div class="kaynak-liste">${L.slice().sort((a,b)=>String(a.grup||'').localeCompare(String(b.grup||''),'tr')||String(a.yil||'').localeCompare(String(b.yil||''))).map(k=>`<div class="kaynak${k.geri_cekildi?' cekildi':''}" data-g="${esc(k.grup||'')}" data-guven="${esc(k.guven||'')}" data-ara="${esc([k.baslik,k.yazar,k.dergi,k.yil,k.grup,k.neden].join(' ').toLocaleLowerCase('tr'))}">
+  function kaynakcaHtml(){const lst=D.kaynakca,gr=[...new Set(lst.map(k=>k.grup).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'tr'));
+    return `<div class="kaynak-arac"><input type="search" class="kaynak-ara" placeholder="Kaynaklarda ara" aria-label="Kaynaklarda ara"><select class="kaynak-grup" aria-label="Gruba göre"><option value="">Bütün gruplar (${lst.length})</option>${gr.map(g=>`<option>${esc(g)}</option>`).join('')}</select>${lst.some(k=>k.guven)?`<select class="kaynak-guven" aria-label="Güven sınıfına göre"><option value="">Bütün türler</option>${window.Object.entries(guvenAd).filter(([g])=>lst.some(k=>k.guven===g)).map(([g,[a]])=>`<option value="${g}">${a}</option>`).join('')}</select>`:''}<button type="button" class="btn ghost" data-kaynak-indir="bib" title="Zotero, Mendeley ve Word için">BibTeX indir</button><button type="button" class="btn ghost" data-kaynak-indir="ris">RIS indir</button></div>
+    <div class="kaynak-liste">${lst.slice().sort((a,b)=>String(a.grup||'').localeCompare(String(b.grup||''),'tr')||String(a.yil||'').localeCompare(String(b.yil||''))).map(k=>`<div class="kaynak${k.geri_cekildi?' cekildi':''}" data-g="${esc(k.grup||'')}" data-guven="${esc(k.guven||'')}" data-ara="${esc([k.baslik,k.yazar,k.dergi,k.yil,k.grup,k.neden].join(' ').toLocaleLowerCase('tr'))}">
       <div class="kaynak-baslik">${esc(k.baslik||'')}</div>
-      <div class="kaynak-meta">${k.geri_cekildi?'<span class="pill cekildi" title="Dergide geri çekildiği kayıtlı; dayanak olarak kullanma">geri çekildi</span> ':''}${k.guven&&GUVEN[k.guven]?`<span class="pill guven g-${k.guven}" title="${GUVEN[k.guven][1]}">${GUVEN[k.guven][0]}</span> `:''}${k.dogrulandi?`<span class="pill dogru" title="Künye dizinden doğrulandı">DOI doğrulandı · ${esc(String(k.dogrulandi).slice(0,10))}</span> `:''}${k.grup?`<span class="pill">${esc(k.grup)}</span> `:''}${esc([k.yazar,k.dergi,k.yil].filter(Boolean).join(' · '))}${k.doi?` · <a href="https://doi.org/${esc(k.doi)}" target="_blank" rel="noopener">doi.org/${esc(k.doi)}</a>`:(k.url?` · <a href="${esc(k.url)}" target="_blank" rel="noopener">bağlantı</a>`:' · <span class="soluk">DOI yok</span>')}</div>
+      <div class="kaynak-meta">${k.geri_cekildi?'<span class="pill cekildi" title="Dergide geri çekildiği kayıtlı; dayanak olarak kullanma">geri çekildi</span> ':''}${k.guven&&guvenAd[k.guven]?`<span class="pill guven g-${k.guven}" title="${guvenAd[k.guven][1]}">${guvenAd[k.guven][0]}</span> `:''}${k.dogrulandi?`<span class="pill dogru" title="Künye dizinden doğrulandı">DOI doğrulandı · ${esc(String(k.dogrulandi).slice(0,10))}</span> `:''}${k.grup?`<span class="pill">${esc(k.grup)}</span> `:''}${esc([k.yazar,k.dergi,k.yil].filter(Boolean).join(' · '))}${k.doi?` · <a href="https://doi.org/${esc(k.doi)}" target="_blank" rel="noopener">doi.org/${esc(k.doi)}</a>`:(k.url?` · <a href="${esc(k.url)}" target="_blank" rel="noopener">bağlantı</a>`:' · <span class="soluk">DOI yok</span>')}</div>
       ${k.neden?`<div class="kaynak-neden">${mdSatir(k.neden)}</div>`:''}
-      <details class="kunye"><summary>künye</summary><code>${esc(kunye(k))}</code>${KOPYA}</details></div>`).join('')}</div><p class="kaynak-yok" hidden>Eşleşen kaynak yok.</p>`}
+      <details class="kunye"><summary>künye</summary><code>${esc(kunye(k))}</code>${kopyaSvg}</details></div>`).join('')}</div><p class="kaynak-yok" hidden>Eşleşen kaynak yok.</p>`}
   function kaynakSuz(panel){const q=(panel.querySelector('.kaynak-ara').value||'').trim().toLocaleLowerCase('tr'),g=panel.querySelector('.kaynak-grup').value,gv=(panel.querySelector('.kaynak-guven')||{}).value||'';let n=0;
     panel.querySelectorAll('.kaynak').forEach(k=>{const v=(!g||k.dataset.g===g)&&(!gv||k.dataset.guven===gv)&&(!q||k.dataset.ara.includes(q));k.hidden=!v;if(v)n++});panel.querySelector('.kaynak-yok').hidden=n>0}
   document.addEventListener('input',e=>{const p=e.target.closest&&e.target.closest('.sayfa-panel');if(p&&(e.target.classList.contains('kaynak-ara')))kaynakSuz(p)});
@@ -2086,7 +2087,7 @@ body{overflow-wrap:break-word}.steps li{grid-template-columns:auto auto minmax(0
     if(rt){const id=rt.closest('.hizli').dataset.hizli;state[id]=Object.assign({},state[id]);const nt=document.getElementById('note-'+id),ek=nt?nt.value.trim():'';
       state[id].note='Hayır: '+rt.dataset.ret.toLocaleLowerCase('tr')+(ek&&!/^hayır/i.test(ek)?'. '+ek:'');state[id].ret=rt.dataset.ret;complete(id);return}
     const sq=t.closest&&t.closest('[data-soru-kaydet]');
-    if(sq){const id=sq.dataset.soruKaydet,ta=document.querySelector(`[data-soru-gir="${CSS.escape(id)}"]`),q=ta?ta.value.trim():'';if(!q)return;
+    if(sq){const id=sq.dataset.soruKaydet,ta=document.querySelector(`[data-soru-gir="${window.CSS.escape(id)}"]`),q=ta?ta.value.trim():'';if(!q)return;
       state[id]=Object.assign({},state[id]);state[id].sorular=(state[id].sorular||[]).concat([{q,at:new Date().toISOString()}]);persist(id);render();setStatus('soru bırakıldı; Ajana haber ver deyince cevaplanır','ok');return}
     const dn=t.closest&&t.closest('[data-dinle]');
     if(dn){const ss=window.speechSynthesis;if(ss.speaking){ss.cancel();dn.textContent='Dinle';return}
