@@ -1337,7 +1337,7 @@ body{overflow-wrap:break-word}.steps li{grid-template-columns:auto auto minmax(0
     const ids=[...document.querySelectorAll('#open .card')].map(c=>c.dataset.id);drag=null;
     if(JSON.stringify(ids)===JSON.stringify(dragOnce))return;kaydet_geri('sıra değişikliği',['_sira']);state._sira={ids};persist('_sira');render()};
   document.addEventListener('pointerup',endDrag);document.addEventListener('pointercancel',endDrag);
-  $('addBtn').addEventListener('click',()=>{const t=$('addTitle').value.trim();if(!t){$('addTitle').focus();return}const id='UG-'+Date.now().toString(36);state[id]={title:t,body:$('addNote').value.trim(),from:'ugur',createdAt:new Date().toISOString()};$('addTitle').value='';$('addNote').value='';persist(id);render();vurgula(id);setStatus('eklendi: '+id+'; ajan bir sonraki turda okur','ok')});
+  $('addBtn').addEventListener('click',()=>{const t=$('addTitle').value.trim();if(!t){$('addTitle').focus();return}const id='UG-'+Date.now().toString(36);state[id]={title:t,body:$('addNote').value.trim(),from:'kullanici',createdAt:new Date().toISOString()};$('addTitle').value='';$('addNote').value='';persist(id);render();vurgula(id);setStatus('eklendi: '+id+'; ajan bir sonraki turda okur','ok')});
   function kararMetni(){
     const ad=o=>o?o.t:'';
     const sat=D.items.filter(it=>!it.resolved).map(it=>{
@@ -1959,7 +1959,7 @@ body{overflow-wrap:break-word}.steps li{grid-template-columns:auto auto minmax(0
   document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('ozetOrtu').hidden){$('ozetOrtu').hidden=true;e.stopPropagation()}},true);
   // ── boy bekçisi: ajana arşiv isteği tek tıkla
   document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-boy]');if(!b)return;const id='UG-'+Date.now().toString(36);
-    state[id]={title:'Defteri arşivle: eski ve sonraya atılan maddeleri arşive al',body:'Boy bekçisi: açık madde sınırı aşıldı.',from:'ugur',createdAt:new Date().toISOString()};persist(id);state._boyUyari={at:new Date().toISOString()};persist('_boyUyari');render();setStatus('ajana iletildi: '+id,'ok')});
+    state[id]={title:'Defteri arşivle: eski ve sonraya atılan maddeleri arşive al',body:'Boy bekçisi: açık madde sınırı aşıldı.',from:'kullanici',createdAt:new Date().toISOString()};persist(id);state._boyUyari={at:new Date().toISOString()};persist('_boyUyari');render();setStatus('ajana iletildi: '+id,'ok')});
   // ── ⋯ menüsü dışına basınca kapanır
   document.addEventListener('click',e=>{document.querySelectorAll('details.daha[open]').forEach(d=>{if(!d.contains(e.target))d.open=false})});
   // ── kaydırarak cevap: sağa Tamamla, sola Sonra (dokunmatik)

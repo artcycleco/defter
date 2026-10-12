@@ -92,10 +92,10 @@ def main():
                     for f in kaynak.iterdir():
                         if f.is_file():
                             shutil.copy2(f, BURASI / f.name)
-                    satirlar.append("Hesaptaki beceri %d, guncel %d; bu oturum icin guncellendi, SKILL.md'yi yeniden oku. Kalici olmasi icin Ugur'a tek satir: hesaptaki beceriyi yeni zip'le degistir (Defter Atolyesi, beceri zip eki)." % (yeni, v))
+                    satirlar.append("Hesaptaki beceri %d, guncel %d; bu oturum icin guncellendi, SKILL.md'yi yeniden oku. Kalici olmasi icin kullaniciya tek satir: hesaptaki beceriyi yeni zip'le degistir (Defter Atolyesi, beceri zip eki)." % (yeni, v))
                     yeni = v
                 except OSError:
-                    satirlar.append("Hesaptaki beceri %d, guncel %d; bu oturumda %s klasorunu kullan ve Ugur'a yeni zip'i yuklemesini soyle." % (yeni, v, kaynak))
+                    satirlar.append("Hesaptaki beceri %d, guncel %d; bu oturumda %s klasorunu kullan ve kullaniciya yeni zip'i yuklemesini soyle." % (yeni, v, kaynak))
     elif kip == "--eklenti":
         if kopya.is_dir() and kopya.resolve() != BURASI and surum(kopya / "karar-defteri.html") < yeni:
             eski = surum(kopya / "karar-defteri.html")

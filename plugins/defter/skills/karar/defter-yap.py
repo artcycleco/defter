@@ -146,9 +146,9 @@ def yapisal(veri):
         hata.append("defter id gecersiz: yalniz harf, rakam, _ . - (Turkce harf yok)")
     gorulen = set()
     items = veri.get("items", [])
-    sinir = int(veri.get("sinir") or 20)  # Ugur onaylarsa kaynakta "sinir": 30; defter bolunmez
+    sinir = int(veri.get("sinir") or 20)  # kullanici onaylarsa kaynakta "sinir": 30; defter bolunmez
     if len(items) > sinir:
-        uyari.append("madde sayisi %d; sinir %d. Asmak gerekiyorsa Ugur'a bir kez sor, onaylarsa kaynaga \"sinir\" yaz" % (len(items), sinir))
+        uyari.append("madde sayisi %d; sinir %d. Asmak gerekiyorsa kullaniciya bir kez sor, onaylarsa kaynaga \"sinir\" yaz" % (len(items), sinir))
     acil = [it for it in items if it.get("priority") == 1]
     if len(acil) > 5:
         uyari.append("%d acil madde; besten cogu acil degildir" % len(acil))
