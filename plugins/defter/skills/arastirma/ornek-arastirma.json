@@ -1,0 +1,58 @@
+{
+ "id": "arastirma-ornek",
+ "title": "Araştırma Defteri; konu adı",
+ "agent": "Araştırma (Claude)",
+ "date": "2026-10-12",
+ "silinmez": true,
+ "purpose": "Tez ve akademik araştırma: strateji, kaynakça ve kararlar tek defterde. Tarama Claude Science'ta ya da bu oturumda yapılır, burada onaylanır.",
+ "sayfalar": [
+  {
+   "id": "strateji",
+   "ad": "Strateji",
+   "body": "#### Ana soru\n\nTek cümle.\n\n#### Yöntem\n\nKısa."
+  },
+  {
+   "id": "takvim",
+   "ad": "Takvim",
+   "body": "| Tarih | İş |\n| --- | --- |\n| | |"
+  },
+  {
+   "id": "yz-beyan",
+   "ad": "Yapay zekâ beyanı",
+   "body": "| Tarih | İş | Kullanıcı ne kadar değiştirdi |\n| --- | --- | --- |"
+  }
+ ],
+ "kaynakcaAd": "Kaynakça",
+ "kaynakca": [],
+ "items": [
+  {
+   "id": "A1",
+   "priority": 2,
+   "type": "design",
+   "title": "✎ Tarama planı: konu adı",
+   "why": "Tarama onaydan önce başlamaz; plan neyi, nerede ve ne kadar arayacağımızı söyler.",
+   "body": "- Soru: tek cümle\n- Kaynaklar: TR Dizin, Crossref, DergiPark, OpenAlex\n- Sözcükler: Türkçe ve İngilizce\n- Aralık: 2010 ile 2026, hedef 30 aday",
+   "options": [
+    {
+     "v": "a",
+     "t": "Planı onayla",
+     "m": "orta · 5 ile 15 bin"
+    },
+    {
+     "v": "b",
+     "t": "Daralt",
+     "d": "Tek kaynak ve 10 aday; daha ucuz ve hızlı.",
+     "m": "düşük"
+    },
+    {
+     "v": "c",
+     "t": "Şimdilik tarama yok",
+     "m": "yok"
+    }
+   ],
+   "rec": "Planı onayla; hedef sayı tez önerisi için yeterli.",
+   "recv": "a",
+   "acildi": "2026-10-12T00:10:55Z"
+  }
+ ]
+}

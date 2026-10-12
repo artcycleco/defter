@@ -1,0 +1,14 @@
+{
+  "name": "artcycle",
+  "owner": {
+    "name": "Artcycle LABS"
+  },
+  "description": "Artcycle LABS araçları",
+  "plugins": [
+    {
+      "name": "defter",
+      "source": "./plugins/defter",
+      "description": "Karar Defteri: Claude'un sana soru sorduğu, dosya gösterdiği ve cevabını okuduğu tek sayfa. A decision notebook: one page where Claude asks, shows files and reads your answers (Turkish)."
+    }
+  ]
+}
