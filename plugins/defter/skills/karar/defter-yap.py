@@ -4,18 +4,23 @@
 Ajan yalniz JSON yazar; sablon HTML'i hic acmaz, hic kopyalamaz, uretilen sayfayi okumaz.
 
 Uret:    python3 defter-yap.py VERI.json docs/defterler/AD.html
-         -> AD.html (sayfa; sablon surumu ayni kaldikca her turda ayni) + AD.veri.json (maddeler)
+         -> AD.html (sayfa; maddelerin gomulu kopyasi da icinde) + AD.veri.json (maddeler)
          Yayinda ikisi birden gider; sonda basilan "Artifact files" haritasini aynen ver.
+         veri.json unutulsa ya da eski kalsa sayfa gomulu kopyayi gosterir (sablon 49).
          --tek  : maddeler sayfanin icinde (tek dosya; yerelde acmak icin)
          --yayinda : ek dosyalari yerelde yoksa hata degil uyari (baska oturumun yayinladigi defteri yukseltirken; dosyalar sunucuda kalir)
 Ekle:    python3 defter-yap.py ekle VERI.json MADDE.json   (ya da - ile stdin; nesne ya da liste; ayni id varsa degistirir)
 Sil:     python3 defter-yap.py sil VERI.json D31 D32
 Liste:   python3 defter-yap.py liste VERI.json            (id, tur, oncelik, baslik; JSON'u okumadan)
-Oku:     python3 defter-yap.py oku VERI.json --url DEFTER_URL --cevap KLASOR [--merkez KLASOR] [--eski KLASOR] [--durum "kisa durum"] [--proje "ad"]
-         --eski: sablon 34 ve oncesinde cevap yalniz "defter" koleksiyonunda; onun out_dir ciktisi
-         KLASOR: ArtifactData list ... out_dir ciktisi (defterin cevap koleksiyonu; Merkez'de cevap koleksiyonu).
-         Yalniz son okumadan beri degisen cevaplari tam yazar; Merkez'den gelen cevaplari defter icin hazirlar;
-         Merkez satirini (acik sorular, son kararlar) .merkez/AD/ altina yazar ve yapilacak iki yazmayi basar.
+Oku:     python3 defter-yap.py oku VERI.json --url DEFTER_URL --cevap KLASOR [--merkez KLASOR] [--durum "kisa durum"] [--proje "ad"]
+         KLASOR: defterin "cevap" ve "defter" koleksiyonlarinin ayni out_dir'e ArtifactData list ciktisi
+         (KLASOR/cevap/*.json, KLASOR/defter/*.json). "defter" koleksiyonu eski sablonlarin cevaplarini,
+         tamamlanmamis notlari (taslak) ve kullanicinin ekledigi maddeleri (UG-) tasir; hep birlikte okunur.
+         Islenmemis her cevabi HER okumada tam basar (kapatilana kadar); Merkez'den gelenleri defter icin hazirlar;
+         Merkez satirini .merkez/AD/ altina yazar ve yapilacak yazmalari basar. --eski KLASOR eski adidir, hala gecer.
+Kapat:   python3 defter-yap.py kapat VERI.json D31 "ne yaptin" [D32 "ne yaptin" ...]
+         cevabi islenen maddeyi kaynaktan cikarir (silinmezde arsive) ve karar kaydina ne yaptigini (y) yazar.
+         Notlu, sorulu ya da retli cevap "kapat" olmadan maddeden cikarilirsa uretec hata verir.
 Sablon:  bu dosyanin yanindaki karar-defteri.html (degismez; kaynak: karar-defteri reposu)
 """
 import datetime, html, io, json, re, sys, pathlib
@@ -299,6 +304,80 @@ def liste(veri_yolu):
         print("%s | %s | %s | %s%s" % (m.get("id"), m.get("type"), m.get("priority"), m.get("title"), ("  [%d dosya]" % ek) if ek else ""))
 
 
+def _merkez_klasoru(veri_yolu, did):
+    return pathlib.Path(veri_yolu).resolve().parent / ".merkez" / str(did)
+
+
+def _l(c):
+    """karar kaydindaki sonuc: secim ve not birlikte (not kaybolmaz)."""
+    p = [str(x) for x in (c.get("label"), c.get("note")) if x]
+    if c.get("ret"):
+        p.append("Hayir: " + str(c["ret"]))
+    return _kisa(" · ".join(p) or "tamam", 200)
+
+
+def _yanit_gerek(c):
+    return bool(c.get("note") or c.get("notlar") or c.get("sorular") or c.get("ret") or c.get("sinif") in ("soru", "serbest", "ret"))
+
+
+def kapanis_denetle(veri, veri_yolu, hata, uyari):
+    """Son 'oku'da islenmemis gorunen cevaplar: maddeden cikan notlu cevabin karar kaydinda 'y' (ne yapildi) olmali."""
+    yol = _merkez_klasoru(veri_yolu, veri.get("id")) / "bekleyen.json"
+    if not yol.is_file():
+        return
+    try:
+        bekleyen = json.loads(yol.read_text(encoding="utf-8"))
+    except ValueError:
+        return
+    simdiki = {str(m.get("id")) for m in veri.get("items") or []}
+    kk = {str(k.get("id")): k for k in veri.get("kararlar") or [] if isinstance(k, dict)}
+    for iid, b in sorted(bekleyen.items()):
+        if (kk.get(iid) or {}).get("y"):
+            continue
+        if iid.startswith("UG-"):
+            uyari.append("%s (kullanicinin ekledigi madde) yanitlanmadi: isle, `kapat` ile ne yaptigini yaz" % iid)
+        elif iid in simdiki:
+            uyari.append("%s cevaplandi, hala acik: isle ve `kapat %s \"ne yaptin\"`" % (iid, iid))
+        elif b.get("yanit_gerek"):
+            hata.append("%s maddeden cikti ama notuna, sorusuna ya da retine ne yapildigi yazilmadi: `defter-yap.py kapat VERI.json %s \"ne yaptin\"`" % (iid, iid))
+
+
+def kapat(veri_yolu, cift):
+    if not cift or len(cift) % 2:
+        sys.exit('kapat: VERI.json ID "ne yaptin" [ID "ne yaptin" ...]')
+    veri = oku(veri_yolu)
+    did = str(veri.get("id"))
+    ky = _merkez_klasoru(veri_yolu, did) / "cevaplar.json"
+    cevaplar = json.loads(ky.read_text(encoding="utf-8")) if ky.is_file() else {}
+    kk = {str(k.get("id")): k for k in veri.get("kararlar") or [] if isinstance(k, dict) and k.get("id")}
+    maddeler = {str(m.get("id")): m for m in veri["items"]}
+    simdi = datetime.datetime.now(datetime.timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+    giden, db_sil = [], []
+    for iid, y in zip(cift[::2], cift[1::2]):
+        c = cevaplar.get(iid) or {}
+        m = maddeler.get(iid) or {}
+        k = dict(kk.get(iid) or {"id": iid})
+        k["t"] = k.get("t") or _kisa(c.get("q") or c.get("title") or m.get("title") or iid, 100)
+        if c and not k.get("l"):
+            k["l"] = _l(c) if not iid.startswith("UG-") else _kisa(c.get("body") or c.get("title") or "", 200)
+        k["at"] = k.get("at") or c.get("doneAt") or c.get("createdAt") or simdi
+        k["y"] = _kisa(y, 300)
+        kk[iid] = k
+        if iid in maddeler:
+            giden.append(iid)
+        db_sil.append({"op": "delete", "collection": "defter" if iid.startswith("UG-") else "cevap", "doc_id": iid})
+    veri["kararlar"] = sorted(kk.values(), key=lambda x: x.get("at", ""), reverse=True)
+    if giden:
+        if veri.get("silinmez"):
+            bugun = datetime.date.today().isoformat()
+            veri["arsiv"] = (veri.get("arsiv") or []) + [dict(m, arsivAt=bugun) for m in veri["items"] if str(m.get("id")) in giden]
+        veri["items"] = [m for m in veri["items"] if str(m.get("id")) not in giden]
+    yaz(veri_yolu, veri)
+    print("kapandi: %s  (kalan %d madde)" % (", ".join(cift[::2]), len(veri["items"])))
+    print("yapilacak: defterde ArtifactData batch (islenen belgeler silinir):")
+    print("  " + json.dumps(db_sil, ensure_ascii=False))
+
+
 YAYINDA = False
 
 
@@ -326,6 +405,7 @@ def uret(veri_yolu, cikti_yolu, sablon=SABLON, tek=False):
                     veri = dict(veri, merkez=m)
                 break
     hata, yapi_uyari = yapisal(veri)
+    kapanis_denetle(veri, veri_yolu, hata, yapi_uyari)
     if not veri.get("url"):
         yapi_uyari.append("kaynakta url yok: ilk yayindan sonra defterin baglantisini \"url\" olarak yaz (Merkez'le esitleme onunla tanir)")
     veri = {k: v for k, v in veri.items() if k not in ("arsiv", "kararlar")}  # arşiv ve karar kaydı kaynakta kalır, sayfaya gitmez
@@ -348,15 +428,18 @@ def uret(veri_yolu, cikti_yolu, sablon=SABLON, tek=False):
 
     cikti = pathlib.Path(cikti_yolu)
     veri_dosyasi = cikti.with_name(cikti.stem + ".veri.json")
+    cikti.parent.mkdir(parents=True, exist_ok=True)
     if not tek:
-        # sayfaya yalniz kimlik girer; maddeler veri.json'dan yuklenir. Sayfa her turda ayni kalir,
-        # yeniden yayinda karsilastirma farki cikmaz (token tasarrufu).
+        # maddeler veri.json'dan yuklenir; sayfada da gomulu kopyasi durur (sablon 49): ajan veri.json'u
+        # yayina vermeyi unutursa ya da eski bir veri.json kalirsa kullanici yine guncel maddeleri gorur.
+        # damga: sayfa veri.json'u yalniz kendinden eski degilse kullanir; yoksa gomulu kopyayi gosterir
+        veri = dict(veri, uretildi=datetime.datetime.now(datetime.timezone.utc).isoformat())
         io.open(veri_dosyasi, "w", encoding="utf-8").write(json.dumps(veri, ensure_ascii=False, indent=1))
         try:
             harita["veri.json"] = str(veri_dosyasi.resolve().relative_to(pathlib.Path.cwd().resolve()))
         except ValueError:
             harita["veri.json"] = str(veri_dosyasi.resolve())
-        gorunen = json.dumps({"id": veri["id"], "title": veri["title"], "veri": "veri.json", "items": []}, ensure_ascii=False).replace("</", "<\\/")
+        gorunen = json.dumps(dict(veri, veri="veri.json"), ensure_ascii=False).replace("</", "<\\/")
     h = io.open(sablon, encoding="utf-8").read()
     i = h.index(BAS)
     j = h.index(SON, i)
@@ -414,12 +497,29 @@ def oku_komutu(veri_yolu, url, cevap_k, merkez_k=None, durum=None, proje=None, b
     for f in (cik / "aktar").glob("*.json"):
         f.unlink()
     cevap = _belgeler(cevap_k)
+    eski_k = eski_k or (cevap_k if (pathlib.Path(cevap_k) / "defter").is_dir() else None)
     merkez = {k.split("__", 1)[1]: v for k, v in _belgeler(merkez_k).items() if k.startswith(aid + "__")}
     maddeler = {str(m.get("id")): m for m in veri["items"]}
     tum = dict({str(m.get("id")): m for m in veri.get("arsiv") or []}, **maddeler)
     # eski sablon: cevap yalniz defter/<id> belgesinde (done:true); cevap belgesi yoksa oradan alinir
+    sizden = {}
     for k, d in _belgeler(eski_k, "defter").items():
-        if k in maddeler and k not in cevap and isinstance(d, dict) and d.get("done"):
+        if not isinstance(d, dict):
+            continue
+        if k.startswith("UG-") and d.get("title"):
+            sizden[k] = d   # kullanicinin "Ajana madde ekle" ile ekledigi madde
+            continue
+        if k in maddeler and k not in cevap and not d.get("done") and (str(d.get("note") or "").strip() or d.get("choice")):
+            # sablon 48 ve oncesi: tamamlanmamis maddedeki not yalniz burada (taslak)
+            t = {"q": _kisa(d.get("q") or maddeler[k].get("title"), 100), "acik": True, "taslak": True}
+            if str(d.get("note") or "").strip():
+                t["note"] = d["note"]
+            if d.get("choice"):
+                t["choice"] = d["choice"]
+                t["label"] = d.get("label") or str(d["choice"])
+            cevap[k] = t
+            continue
+        if k in maddeler and k not in cevap and d.get("done"):
             c = {"q": _kisa(d.get("q") or maddeler[k].get("title"), 100), "doneAt": d.get("doneAt") or d.get("updatedAt") or ""}
             if d.get("choice") is not None:
                 c["choice"] = d["choice"]
@@ -427,14 +527,43 @@ def oku_komutu(veri_yolu, url, cevap_k, merkez_k=None, durum=None, proje=None, b
             if d.get("note"):
                 c["note"] = d["note"]
             cevap[k] = c   # arşivdeki kararlar da Kararlar'a girer
-    # 1) degisen cevaplar: son okumadan beri doneAt ya da icerik degisenler tam, gerisi sayi
+    # 1) islenmemis cevaplar: maddesi kaynakta duran her cevap HER okumada tam basilir (kapatilana kadar).
+    #    Eskiden "okundu" isareti basinca konuyordu; ajanin baglami kapanirsa cevap bir daha gorunmuyordu.
     on_yol = cik / "okunan.json"
     onceki = json.loads(on_yol.read_text(encoding="utf-8")) if on_yol.exists() else {}
     simdi = {k: json.dumps(v, sort_keys=True, ensure_ascii=False) for k, v in cevap.items()}
-    degisen = [k for k in cevap if onceki.get(k) != simdi[k]]
-    print("== %s: %d cevap; %d yeni ya da degisen, %d ayni (okunmadi)" % (did, len(cevap), len(degisen), len(cevap) - len(degisen)))
-    for k in sorted(degisen, key=lambda x: cevap[x].get("doneAt", "")):
-        print("  %s %s -> %s" % (k, _kisa(cevap[k].get("q") or (maddeler.get(k) or {}).get("title"), 70), _cevap_metni(cevap[k])))
+    kk_once = {str(k.get("id")): k for k in veri.get("kararlar") or [] if isinstance(k, dict)}
+    islenmemis = [k for k in cevap if k in maddeler and not cevap[k].get("acik")]
+    sorulu = [k for k in cevap if k in maddeler and cevap[k].get("acik") and cevap[k].get("sorular")
+              and len(cevap[k]["sorular"]) > len(maddeler[k].get("yanitlar") or [])]
+    taslak = [k for k in cevap if k in maddeler and cevap[k].get("taslak") and k not in sorulu]
+    kapali = [k for k in cevap if k not in maddeler]
+    print("== %s: %d islenmemis cevap, %d yanitsiz soru, %d taslak not, %d senin eklediğin madde; %d cevap zaten kapali"
+          % (did, len(islenmemis), len(sorulu), len(taslak), len([k for k in sizden if not (kk_once.get(k) or {}).get("y")]), len(kapali)))
+    baslik = lambda k: _kisa(cevap[k].get("q") or (maddeler.get(k) or {}).get("title"), 70)
+    for k in sorted(islenmemis, key=lambda x: cevap[x].get("doneAt", "")):
+        print("  %s %s %s -> %s" % ("YENI   " if onceki.get(k) != simdi[k] else "BEKLIYOR", k, baslik(k), _cevap_metni(cevap[k])))
+    for k in sorulu:
+        print("  SORU    %s %s -> %s" % (k, baslik(k), _cevap_metni(cevap[k])))
+    for k in taslak:
+        if onceki.get(k) != simdi[k]:
+            print("  TASLAK  %s %s -> %s  (tamamlanmadi; notu oku, istek ya da soruysa yanitla; secimi Tamamla gelmeden uygulama)" % (k, baslik(k), _cevap_metni(cevap[k])))
+        else:
+            print("  TASLAK  %s degismedi: %s" % (k, _kisa(cevap[k].get("note") or cevap[k].get("label"), 80)))
+    for k, d in sorted(sizden.items()):
+        if not (kk_once.get(k) or {}).get("y"):
+            print("  SENDEN  %s %s%s" % (k, d.get("title"), (" | " + d["body"]) if d.get("body") else ""))
+    tum_id = set(tum) | set(kk_once)
+    iki_hafta = (datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(days=14)).isoformat()[:19]
+    for k in sorted(cevap):
+        if k not in tum_id and str(cevap[k].get("doneAt", "")) >= iki_hafta:
+            print("  UYARI   %s: bu cevabin maddesi kaynakta yok. Kaynak JSON canli defterden eski olabilir (baska oturum yayinlamis); "
+                  "canli veri.json'u Artifact read ile al, karsilastir, sonra uret." % k)
+    yapilacak = islenmemis + sorulu + [k for k in sizden if not (kk_once.get(k) or {}).get("y")]
+    if yapilacak:
+        print("  -> isle, sonra kapat: python3 defter-yap.py kapat %s %s" % (veri_yolu, " ".join('%s "ne yaptin"' % k for k in islenmemis + [k for k in sizden if not (kk_once.get(k) or {}).get("y")])))
+        if sorulu:
+            print("     soru(lar): maddeye \"yanitlar\" ekle, madde acik kalir: %s" % ", ".join(sorulu))
     # 2) Merkez'den gelen ve defterde henuz olmayan cevaplar: deftere yazilacak
     aktar, celiski = [], []
     for iid, c in sorted(merkez.items()):
@@ -473,11 +602,12 @@ def oku_komutu(veri_yolu, url, cevap_k, merkez_k=None, durum=None, proje=None, b
                 r[b] = m[a]
         return r
     kararlar = sorted(({"id": k, "t": _kisa(v.get("q") or (tum.get(k) or {}).get("title"), 100),
-                        "l": _kisa(v.get("label") or v.get("note") or "tamam", 120), "at": v.get("doneAt", "")}
+                        "l": _l(v), "at": v.get("doneAt", "")}
                        for k, v in cevap.items() if k in tum and not v.get("acik")), key=lambda x: x["at"], reverse=True)
     # kararlar kaynakta birikir: ajan cevabi sildikten sonra da Merkez'in Kararlar sekmesinde kalir
     eski = {k["id"]: k for k in veri.get("kararlar") or [] if isinstance(k, dict) and k.get("id")}
-    eski.update({k["id"]: k for k in kararlar})
+    for k in kararlar:   # ajanin yazdigi "y" (ne yapildi) korunur
+        eski[k["id"]] = dict(k, y=eski[k["id"]]["y"]) if (eski.get(k["id"]) or {}).get("y") else k
     kararlar = sorted(eski.values(), key=lambda x: x.get("at", ""), reverse=True)   # kaynakta sınırsız
     if kararlar != (veri.get("kararlar") or []):
         veri["kararlar"] = kararlar
@@ -507,7 +637,12 @@ def oku_komutu(veri_yolu, url, cevap_k, merkez_k=None, durum=None, proje=None, b
     if butce:
         sat["butce"] = _kisa(butce, 80)
     io.open(cik / "satir.json", "w", encoding="utf-8").write(json.dumps(sat, ensure_ascii=False, indent=1))
-    io.open(on_yol, "w", encoding="utf-8").write(json.dumps({k: json.dumps(v, sort_keys=True, ensure_ascii=False) for k, v in _belgeler(cevap_k).items()}, ensure_ascii=False))
+    io.open(on_yol, "w", encoding="utf-8").write(json.dumps(simdi, ensure_ascii=False))
+    # kapat ve uret icin: islenmemis cevaplar ve butun cevaplar (karar kaydina secim, not, tarih buradan gider)
+    bek = {k: {"yanit_gerek": _yanit_gerek(cevap[k])} for k in islenmemis}
+    bek.update({k: {"yanit_gerek": True} for k in sizden if not (kk_once.get(k) or {}).get("y")})
+    io.open(cik / "bekleyen.json", "w", encoding="utf-8").write(json.dumps(bek, ensure_ascii=False))
+    io.open(cik / "cevaplar.json", "w", encoding="utf-8").write(json.dumps(dict(sizden, **cevap), ensure_ascii=False))
     print("\nMerkez satiri: %d acik soru, %d karar -> %s" % (len(acik), len(kararlar), cik / "satir.json"))
     print("yapilacak yazmalar:")
     if aktar:
@@ -522,6 +657,8 @@ if __name__ == "__main__":
         ekle(a[1], a[2])
     elif a[:1] == ["sil"] and len(a) >= 3:
         sil(a[1], a[2:])
+    elif a[:1] == ["kapat"] and len(a) >= 4:
+        kapat(a[1], a[2:])
     elif a[:1] == ["liste"] and len(a) == 2:
         liste(a[1])
     elif a[:1] == ["oku"] and len(a) >= 2:

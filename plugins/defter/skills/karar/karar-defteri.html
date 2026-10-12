@@ -1,5 +1,5 @@
 <title>Karar Defteri Şablonu</title>
-<!-- karar-defteri şablon sürümü: 48 (2026-10-12): dar ekranda adım, dosya ve düz satırdaki uzun bağlantı ve yol alt satıra kırılır, sayfa yana taşmaz; beceride iletişim kuralı (Yaptım, Senin işin, Soru). 47 (2026-10-12): Drive köprüsü: defter cevaplarını ve açık sorularını kullanıcının Drive'ındaki "Defter Esitleme" klasörüne bırakır, Merkez'in gönderdiği cevapları oradan alır (yapay zekâ çalışmaz); menüde "Merkez'le eşitle". 46 (2026-10-12): acil ve riskli maddede şık seçmeden tamamlanmaz; toplu cevap ve kaydırma riskli maddeyi atlar; yedeği indir (JSON ve md); kaynakçada güven sınıfı, DOI doğrulandı, geri çekildi rozetleri, BibTeX ve RIS indir; kaydırma tablo, kod ve rapor metninde çalışmaz; Hayır nedenlerinde "Başka öner"; uzun önerim katlanır; ⋯ menüsü klavyeyle gezilir; her yerde odak çerçevesi. 45 (2026-10-12): Merkez'den gelen cevap deftere işlenir; açık maddenin sorusu da ajana gider; #id ile maddeye git; odak modu; komut paleti (Ctrl+K); çevrimdışı kuyruk; karar kartı, taslak 24 saat, kesinleştir, gerekçe, yerine geçti zinciri, kim karar verir (daci), geri dönülmez rozeti; bekleme süresi; gereksiz soru; sessiz saatler; boy bekçisi; bütçe satırı; haftalık karar özeti; toplu cevap; kaydırarak cevap; yazdırma; sade kart (Tamamla öneriyle tamamlar, ⋯ menüsü, 📎 not kutusunda). 44 (2026-10-11): okuma sayfaları (sayfalar), aranır ve süzülür kaynakça (kaynakca), metinde görsel, teyit adımı (onay). 43: hızlı cevap (Tamam, Hayır ve nedeni, Soru sor); kartta soru ve ajanın cevabı (yanitlar); yeni ve değişti rozeti (degisti); risk rozeti; not sınıflama (sinif); Bitti de arama; sekmede acil sayısı; okundu; Dinle; veritabanı yoksa Claude a gönder; proje rengi. 42: başlıkta LABS diyafram logosu ve tam ad; menüde çizgi ikonlar, acil varsa turuncu bildirim noktası; şıkta maliyet rozeti (m); metindeki çıplak adresler tıklanır. 41: yeni üst şerit (ayarlar çarkı, tam ekran menü, ince ilerleme çizgisi), durum kısa bildirim; açıklama satırları kılavuza; karşılaştırma ölçüler aynıysa sürgü, değilse yan yana ve tam ekran; yakınlaştırma hafızası. 40: şıkların yanında açıkla düğmesi (d alanı seçmeden okunur); terimler alanı, kelimeye dokununca tanımı açılır. 39: önce/sonra sürgüsü kırpmaz, akıcı, oranlar çok farklıysa yan yana; mikrofon kapalıysa düğmenin yanında sistem diktesi ipucu. 38: Ajana haber ver düğmesi (yorumla oturumu uyandırır); çoklu seçim; görsele numaralı iğne ve not; önce/sonra sürgüsü; termin için takvime ekle; dikte düğmesi; indirilebilir dosya eki (zip). Kaynak: github.com/artcycleco/defter. -->
+<!-- karar-defteri şablon sürümü: 49 (2026-10-12): maddeler sayfaya da gömülür, veri.json yayına gitmese ya da eski kalsa da sayfa doğru maddeleri gösterir; tamamlanmamış maddeye yazılan not ve seçim de ajana gider (taslak); Ajana haber ver mesajı tamamlanmamış notları da sayar. 48 (2026-10-12): dar ekranda adım, dosya ve düz satırdaki uzun bağlantı ve yol alt satıra kırılır, sayfa yana taşmaz; beceride iletişim kuralı (Yaptım, Senin işin, Soru). 47 (2026-10-12): Drive köprüsü: defter cevaplarını ve açık sorularını kullanıcının Drive'ındaki "Defter Esitleme" klasörüne bırakır, Merkez'in gönderdiği cevapları oradan alır (yapay zekâ çalışmaz); menüde "Merkez'le eşitle". 46 (2026-10-12): acil ve riskli maddede şık seçmeden tamamlanmaz; toplu cevap ve kaydırma riskli maddeyi atlar; yedeği indir (JSON ve md); kaynakçada güven sınıfı, DOI doğrulandı, geri çekildi rozetleri, BibTeX ve RIS indir; kaydırma tablo, kod ve rapor metninde çalışmaz; Hayır nedenlerinde "Başka öner"; uzun önerim katlanır; ⋯ menüsü klavyeyle gezilir; her yerde odak çerçevesi. 45 (2026-10-12): Merkez'den gelen cevap deftere işlenir; açık maddenin sorusu da ajana gider; #id ile maddeye git; odak modu; komut paleti (Ctrl+K); çevrimdışı kuyruk; karar kartı, taslak 24 saat, kesinleştir, gerekçe, yerine geçti zinciri, kim karar verir (daci), geri dönülmez rozeti; bekleme süresi; gereksiz soru; sessiz saatler; boy bekçisi; bütçe satırı; haftalık karar özeti; toplu cevap; kaydırarak cevap; yazdırma; sade kart (Tamamla öneriyle tamamlar, ⋯ menüsü, 📎 not kutusunda). 44 (2026-10-11): okuma sayfaları (sayfalar), aranır ve süzülür kaynakça (kaynakca), metinde görsel, teyit adımı (onay). 43: hızlı cevap (Tamam, Hayır ve nedeni, Soru sor); kartta soru ve ajanın cevabı (yanitlar); yeni ve değişti rozeti (degisti); risk rozeti; not sınıflama (sinif); Bitti de arama; sekmede acil sayısı; okundu; Dinle; veritabanı yoksa Claude a gönder; proje rengi. 42: başlıkta LABS diyafram logosu ve tam ad; menüde çizgi ikonlar, acil varsa turuncu bildirim noktası; şıkta maliyet rozeti (m); metindeki çıplak adresler tıklanır. 41: yeni üst şerit (ayarlar çarkı, tam ekran menü, ince ilerleme çizgisi), durum kısa bildirim; açıklama satırları kılavuza; karşılaştırma ölçüler aynıysa sürgü, değilse yan yana ve tam ekran; yakınlaştırma hafızası. 40: şıkların yanında açıkla düğmesi (d alanı seçmeden okunur); terimler alanı, kelimeye dokununca tanımı açılır. 39: önce/sonra sürgüsü kırpmaz, akıcı, oranlar çok farklıysa yan yana; mikrofon kapalıysa düğmenin yanında sistem diktesi ipucu. 38: Ajana haber ver düğmesi (yorumla oturumu uyandırır); çoklu seçim; görsele numaralı iğne ve not; önce/sonra sürgüsü; termin için takvime ekle; dikte düğmesi; indirilebilir dosya eki (zip). Kaynak: github.com/artcycleco/defter. -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Manrope:wght@400;500;600;700&display=swap">
 <style>
@@ -824,9 +824,12 @@ body{overflow-wrap:break-word}.steps li{grid-template-columns:auto auto minmax(0
 
 <script>
 (async function(){
-  // maddeler ayrı dosyadan (veri.json): sayfa her turda aynı kalır, ajan yalnız veriyi yayınlar
+  // maddeler veri.json'dan; sayfada gömülü kopya da var (uretildi damgalı). veri.json yayına gitmediyse ya da
+  // sayfadan eskiyse gömülü kopya gösterilir: ajan dosyayı unutsa da kullanıcı eski listeyi görmez
   const D=await (async()=>{const ic=JSON.parse(document.getElementById('defter').textContent);if(!ic.veri)return ic;
-    try{const r=await fetch(ic.veri+(ic.veri.includes('?')?'&':'?')+'t='+Date.now(),{cache:'no-store'});if(r.ok){const d=await r.json();if(d&&Array.isArray(d.items))return Object.assign({},d,{id:ic.id||d.id})}}catch(e){}
+    const gomulu=Array.isArray(ic.items)&&!!ic.uretildi;
+    try{const r=await fetch(ic.veri+(ic.veri.includes('?')?'&':'?')+'t='+Date.now(),{cache:'no-store'});if(r.ok){const d=await r.json();if(d&&Array.isArray(d.items)&&(!gomulu||String(d.uretildi||'')>=ic.uretildi))return Object.assign({},d,{id:ic.id||d.id})}}catch(e){}
+    if(gomulu)return ic;
     return Object.assign({items:[]},ic,{_veriYok:true})})();
   const P={1:'Acil',2:'Önemli',3:'Sonra'}, T={design:'✎ kararın',tech:'⚙ teknik',info:'ⓘ bilgi',report:'▤ rapor',task:'☐ görev'};
   const FT={all:['Hepsi','Bütün maddeler'],design:['✎ Kararın','Senin vereceğin kararlar: tasarım, marka, para, hukuk, kullanıcıya görünen metin'],tech:['⚙ Teknik','Ajanın verdiği teknik kararlar; itiraz kutusu, boş bırakırsan kabul'],info:['ⓘ Bilgi','Şunu bil maddeleri; okuyup Tamamla'],report:['▤ Rapor','Araştırma bulguları ve metinler; oku, sorunu yaz, Okudum'],task:['☐ Görev','Senin dışarıda yapacağın işler: adım adım, ne getireceğin yazılı']};
@@ -865,7 +868,12 @@ body{overflow-wrap:break-word}.steps li{grid-template-columns:auto auto minmax(0
     // ajanın okuduğu ince belge: yalnız tamamlanmış maddeler, yalnız gereken alanlar
     const ref=db.doc('cevap/'+id);const sor=Array.isArray(d.sorular)?d.sorular:[];
     // açık maddedeki soru da ajana gider (acik:true); ajan cevaplar, madde açık kalır
-    if(!d.done){if(sor.length)await ref.set({q:d.q||'',acik:true,sorular:sor});else{try{await ref.delete()}catch(e){}}return}
+    // tamamlanmamış maddeye yazılan not, seçim ya da dosya notu da gider (taslak:true): Kullanıcı yazdıysa ajan görür
+    if(!d.done){const nl=dosyaNotlari(id,d),sec=Array.isArray(d.choice)?d.choice.length>0:!!d.choice,not=String(d.note||'').trim();
+      if(!sor.length&&!not&&!sec&&!nl.length){try{await ref.delete()}catch(e){}return}
+      const c={q:d.q||'',acik:true};if(sor.length)c.sorular=sor;
+      if(not||sec||nl.length){c.taslak=true;if(not)c.note=d.note;if(sec){c.choice=d.choice;c.label=d.label||d.choice}if(nl.length)c.notlar=nl}
+      await ref.set(c);return}
     const c={q:d.q||'',doneAt:d.doneAt||''};
     ['sinif','ret','gerekce','kaynak','kesin','teyit'].forEach(k=>{if(d[k])c[k]=d[k]});if(d.gereksiz)c.gereksiz=true;if(sor.length)c.sorular=sor;
     {const it=D.items.find(x=>x.id===id);if(it&&it.acildi&&d.doneAt){const h=Math.round((new Date(d.doneAt)-acildiT(it))/36e5);if(h>=0)c.bekledi=h}}
@@ -880,7 +888,8 @@ body{overflow-wrap:break-word}.steps li{grid-template-columns:auto auto minmax(0
     const acik=D.items.filter(it=>!it.resolved&&!(state[it.id]||{}).done).length;
     const bitti=D.items.filter(it=>!it.resolved&&(state[it.id]||{}).done).length;
     const senden=Object.keys(state).filter(k=>k.startsWith('UG-')).length;
-    db.doc('defter/_ozet').set({acik,bitti,senden,son:new Date().toISOString()}).catch(()=>{})},1500)}
+    const taslak=D.items.filter(it=>{const s=state[it.id]||{};return !it.resolved&&!s.done&&String(s.note||'').trim()}).length;
+    db.doc('defter/_ozet').set({acik,bitti,senden,taslak,son:new Date().toISOString()}).catch(()=>{})},1500)}
   function zenginlestir(id){
     if(id.startsWith('_')||id.startsWith('UG-'))return;
     const it=D.items.find(x=>x.id===id),s=state[id];if(!it||!s)return;
@@ -1800,7 +1809,8 @@ body{overflow-wrap:break-word}.steps li{grid-template-columns:auto auto minmax(0
   $('haberBtn').addEventListener('click',async()=>{const b=$('haberBtn');if(!yorum)return;
     const biten=D.items.filter(it=>(state[it.id]||{}).done).map(it=>it.id);
     const sorulu=D.items.filter(it=>((state[it.id]||{}).sorular||[]).length>(it.yanitlar||[]).length).map(it=>it.id);
-    const metin='Defteri doldurdum'+(biten.length?': '+biten.join(', ')+' tamamlandı':'')+(sorulu.length?'; sorular: '+sorulu.join(', '):'')+'. Defteri oku ve işle.';
+    const taslakNot=D.items.filter(it=>{const s=state[it.id]||{};return !s.done&&String(s.note||'').trim()}).map(it=>it.id);
+    const metin='Defteri doldurdum'+(biten.length?': '+biten.join(', ')+' tamamlandı':'')+(sorulu.length?'; sorular: '+sorulu.join(', '):'')+(taslakNot.length?'; tamamlanmamış notlar: '+taslakNot.join(', '):'')+'. Defteri oku ve işle.';
     b.disabled=true;setStatus('ajana haber veriliyor…');
     try{const a=await yorum.anchorFor(document.getElementById('title')||b);await yorum.sendToClaude({anchor:a,text:metin});setStatus('ajana haber verildi; cevap yorumda gelir','ok');b.classList.remove('nabiz')}
     catch(e){setStatus(e&&e.code==='claude_unavailable'?'şu an haber verilemiyor; sohbete yaz':'haber verilemedi: '+(e&&e.code||''),'uyari')}

@@ -41,7 +41,7 @@ Yapamadığın iş (izin reddi, erişim yok, bağlayıcı kapalı) "Senin işin"
 1. Çalışırken çıkan her görev, soru ve teknik karar o iş adımında deftere eklenir ve yayınlanır; oturum sonuna biriktirilmez.
 2. Hazırladığın md, PDF, HTML, görsel ya da video ilgili maddeye `ekler` olarak konur. Kullanıcıya yalnız dosya yolu verilmez.
 3. Görünüşle ilgili soruda canlıysa bağlantı, değilse ekran görüntüsü şart; yoksa önce görüntüyü üret, sonra sor.
-4. Görev boyunca her iş kaleminin sonunda ve her commit'ten önce `_ozet` okunur; onaylanan cevap hemen işlenir.
+4. Görev boyunca her iş kaleminin sonunda ve her commit'ten önce `_ozet` okunur; `son` alanı son okumandan yeniyse "oku" kipini tam çalıştır (sayılar sıfır olsa da: tamamlanmamış not sayılara girmez). Onaylanan cevap hemen işlenir.
 5. Görevi bitmiş saymadan önce defter son kez okunur. Cevapta iş varsa yapılır. Cevap yoksa ve iş ona bağlıysa durulur: "Defterde N madde cevabını bekliyor: <bağlantı>".
 6. Kullanıcı defterdeki **Ajana haber ver**'e basınca bu oturuma "Defteri doldurdum" yorumu gelir: "oku" kipini çalıştır, sonunda yoruma tek satırla cevap ver.
 7. Acil madde eklediysen ve `PushNotification` aracın varsa tek satır bildirim gönder ("Defterde 1 acil madde: <başlık>").
@@ -50,11 +50,11 @@ Yapamadığın iş (izin reddi, erişim yok, bağlayıcı kapalı) "Senin işin"
 
 ## Bütçe
 - Şablonu, üretilen sayfayı ve `.veri.json` dosyasını okuma. Kaynak JSON'u bütün okuma; `liste`, `ekle`, `sil` alt komutları var.
-- Sayfa (`<ad>.html`) şablon sürümü değişmedikçe her turda aynıdır; değişen yalnız `veri.json`. Bu yüzden yeniden yayın ucuzdur.
+- Sayfa (`<ad>.html`) maddelerin gömülü kopyasını da taşır (şablon 49). `veri.json`'u yayına vermeyi unutursan sayfa yine güncel maddeleri gösterir; yine de haritayı her yayında aynen ver (ekler de orada).
 - Bir iş adımında çıkan maddeleri tek yayında topla; madde başına ayrı yayın yapma.
-- Cevap okuma sırası: `_ozet`, sonra `cevap`. `defter` koleksiyonunu okuma (sayfanın kendi durumu).
+- Cevap okuma: `cevap` ve `defter` koleksiyonları aynı `out_dir`'e, sonra `defter-yap.py oku`. Belgeleri tek tek okuma; üreteç basar.
 - Ekran görüntüsünü çekip maddeye koy; kendin açıp bakma, yalnız doğrulaman gerekiyorsa bak.
-- Cevapları `defter-yap.py oku` ile oku: aynı oturumda daha önce okuduğun cevabı yeniden yazdırmaz, yalnız değişeni tam basar.
+- Cevapları `defter-yap.py oku` ile oku: işlenmemiş her cevabı, kapatana kadar her okumada tam basar; bağlamın kapansa da cevap kaybolmaz.
 - Yükseltme ve Merkez satırı gibi mekanik işi küçük modele ver (Agent aracı, `model: haiku`); karar ve metin işini kendin yap.
 - Yayında `"butce": "bu hafta ≈ 40 bin token"` gibi kabaca tahmini kaynak JSON'a yaz; menüde görünür.
 - Bu dosya kısa kural; ayrıntı için KULLANIM.md'de yalnız ilgili bölümü aç.
@@ -95,12 +95,14 @@ Projede `scripts/defter-yap.py` varsa aynı üretecin yönlendirmesidir.
 - Kullanıcının kopyalayıp bir yere yapıştıracağı her şey kopyalanabilir verilir: komut satır içinde `` `komut` `` ya da ``` bloğu; bir ajana ya da kişiye gönderilecek mesaj ```` ```mesaj Site ajanına ```` bloğu (başlık hedefi söyler). Hepsinde kopyala simgesi çıkar; kullanıcı elle seçmez. Kural: `${CLAUDE_SKILL_DIR}/YAZIM-KURALI.md`.
 
 ## "oku": cevapları işle
-1. `read_db` get `defter/_ozet` → `{acik, bitti, senden, son}`; `bitti` ve `senden` sıfırsa ve Merkez'de bu deftere cevap yoksa dur.
+1. Kestirme yok: `_ozet`e bakıp durma. Kullanıcı tamamlamadan not yazmış olabilir (taslak); hep 2. adımı yap.
 2. Cevapları topla ve üreteçle oku (KULLANIM §12):
    - ArtifactData `list`, defterin url'si, collection `cevap`, `out_dir` `.merkez/ham/<ad>`;
+   - ArtifactData `list`, defterin url'si, collection `defter`, aynı `out_dir` (eski şablonların cevapları, tamamlanmamış notlar, kullanıcının eklediği `UG-` maddeleri buradadır);
    - ArtifactData `query`, Merkez url'si, collection `cevap`, `where [["defter","==","<defter doc_id>"]]`, `out_dir` `.merkez/ham/<ad>-merkez`;
-   - `python3 ${CLAUDE_SKILL_DIR}/defter-yap.py oku docs/defterler/veri/<ad>.json --url <defter url> --cevap .merkez/ham/<ad> --merkez .merkez/ham/<ad>-merkez --durum "<şu an ne yapıyorsun, tek satır>" --proje "<proje>"`. Defter 34 ya da daha eski şablondan geldiyse `defter` koleksiyonunu da indir ve `--eski .merkez/ham/<ad>-eski` ekle; eski cevaplar yalnız orada.
-   Çıktı yalnız yeni ya da değişen cevapları basar, Merkez'den gelenleri deftere taşımak için hazırlar ve iki yazmayı söyler: deftere `cevap` belgeleri (batch), Merkez'e satır (`defterler/<doc_id>` update). İkisini yap.
+   - `python3 ${CLAUDE_SKILL_DIR}/defter-yap.py oku docs/defterler/veri/<ad>.json --url <defter url> --cevap .merkez/ham/<ad> --merkez .merkez/ham/<ad>-merkez --durum "<şu an ne yapıyorsun, tek satır>" --proje "<proje>"`.
+   Çıktının satırları: `YENI` ve `BEKLIYOR` işlenmemiş cevap (BEKLIYOR = daha önce basıldı, hâlâ kapatılmadı; atlanmaz), `SORU` yanıt bekleyen soru, `TASLAK` kullanıcının tamamlamadan yazdığı not ya da seçim, `SENDEN` kullanıcının eklediği madde, `UYARI` maddesi kaynakta olmayan cevap (kaynak JSON canlı defterden eski: canlı `veri.json`'u Artifact read ile al, birleştir, sonra üret). Merkez'den gelenleri deftere taşımak için hazırlar ve yazmaları söyler: deftere `cevap` belgeleri (batch), Merkez'e satır (`defterler/<doc_id>` update). Hepsini yap.
+   `TASLAK`: notu oku; soru ya da istekse yanıtla (`yanitlar`) ya da yap; seçimi Tamamla gelmeden uygulama. `SENDEN`: maddeyi işle (yeni madde aç ya da yap), sonra `kapat`.
    Cevap alanları: `{q, choice, label, note, steps, gorsel, notlar, doneAt}`. Çoklu soruda `choice` liste, `label` "A · B". `notlar` kullanıcının tek tek dosyalara ve görseldeki numaralı iğnelere yazdığı notlardır: `[{ad, tur, not}]` (`tur: "igne"`, `ad: "Görsel · iğne 2"`); her birini o yere dair geri bildirim say.
 Cevapta `sinif` (onay, ret, soru, serbest, gereksiz) varsa onay ve reti tek satır işle, gerisini tam oku; `ret` Hayır nedeni. `sorular: [{q, at}]` kullanıcının o maddeye sorduklarıdır: maddeye `"yanitlar": [{"q": "...", "a": "..."}]` ekleyip yayınla, madde açık kalır. `acik: true` olan cevap belgesi tamamlanmamış maddedeki sorudur; yalnız yanıtla.
 - `gereksiz: true`: Kullanıcı bu soruyu gereksiz buldu. Kararı kendin ver, ⚙ olarak bildir; bu türde bir daha sorma (proje notuna ya da `docs/KARARLAR.md`'ye "bu tür soruyu ajan karar verir" yaz).
@@ -112,7 +114,7 @@ Cevapta `sinif` (onay, ret, soru, serbest, gereksiz) varsa onay ve reti tek sat�
 3. `senden` sıfır değilse `defter` içinde `UG-` ile başlayan belgeler.
 Not belirsizse, önerini tersine çeviriyorsa ya da kendi yazdığın metinle çelişiyorsa uygulama: o notu alıntılayıp iki okumayı şık yapan görselli bir ✎ teyit maddesi aç, öteki cevaplarla devam et. Rapor (▤) maddesine gelen not geri bildirimdir; bir kararı değiştirecekse ayrı ✎ madde açılır, nottan karar çıkarılmaz.
 Kaynak JSON'da `"silinmez": true` varsa (tez gibi): `sil` maddeyi tarihle `arsiv`e taşır, `cevap/<id>` kayıtları silinmez; hiçbir şey kaybolmaz.
-Her cevap için: karar kaydı (`docs/KARARLAR.md` varsa `tarih | karar | defter id`) → uygula → `sil` ile maddeyi kaynaktan çıkar → `write_db` batch ile `cevap/<id>` sil → üret ve yayınla → sohbette tek satır. Silinen id bir daha kullanılmaz.
+Her cevap için: karar kaydı (`docs/KARARLAR.md` varsa `tarih | karar | defter id`) → uygula → `defter-yap.py kapat docs/defterler/veri/<ad>.json <id> "ne yaptın, tek cümle"` (maddeyi çıkarır, karar kaydına `y` yazar; Merkez'in Kararlar sekmesinde "Ajan: …" olarak görünür) → kapatın bastığı batch ile belgeleri sil → üret ve yayınla → sohbette tek satır. Notlu, sorulu ya da retli cevabı `sil` ile çıkarırsan üreteç durur; `kapat` kullan. Silinen id bir daha kullanılmaz.
 
 ## "yükselt" ve "güncelle"
 - Yükselt: kaynak JSON aynı; yeni şablonla üret, aynı bağlantıya yayınla. Cevaplar madde id'siyle durur.

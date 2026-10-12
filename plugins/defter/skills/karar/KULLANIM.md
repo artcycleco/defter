@@ -25,8 +25,8 @@ Defter oturum sonunda doldurulan bir rapor değildir; iş sürerken yaşar. Beş
 1. **Yeni görev, soru ya da teknik karar anında deftere girer.** Düşünürken ya da çalışırken ortaya çıkan her madde o an JSON'a eklenir, defter üretilir ve aynı yola yeniden yayınlanır. Sohbette liste yazılmaz, oturum sonuna biriktirilmez.
 2. **Hazırladığın her dosya defterde sunulur.** md, PDF, HTML, görsel ya da video ürettiysen ilgili maddeye `ekler` (ya da görsel ve video için `gorseller`) olarak koy. Kullanıcıya dosya yolu verilmez; dosyayı defterin içinde açar, okur, üzerine çizer. Ayrıntı §4.
 3. **Görünüşle ilgili soruda kanıt şarttır.** Bir şeyin nasıl göründüğünü soruyorsan, canlıysa çalışan bağlantıyı, değilse ekran görüntüsünü maddeye koy. İkisi de yoksa önce görüntüyü üret (yerel sunucu + Playwright ekran görüntüsü), sonra sor. Üreteç kanıtsız görünüş sorusuna uyarı basar.
-4. **Cevaplar görev boyunca okunur.** Her iş kaleminin sonunda, her commit'ten önce ve uzun işte en geç yarım saatte bir `defter/_ozet` okunur (§7). Onaylanan cevap hemen işlenir: karar kaydı, uygulama, maddenin silinmesi, yeniden yayın.
-5. **"Bitti" demeden önce defter okunur.** Görevi bitmiş saymadan önce son kez `_ozet` ve `cevap` okunur. Cevaplanan maddede yapılacak iş varsa ona başlanır ve döngü tekrarlanır. Cevap gelmemiş ve iş ona bağlıysa durulur: sohbette tek satır "Defterde N madde cevabını bekliyor: `<bağlantı>`", sonra beklenir. Cevaba bağlı olmayan işler sürer.
+4. **Cevaplar görev boyunca okunur.** Her iş kaleminin sonunda, her commit'ten önce ve uzun işte en geç yarım saatte bir `defter/_ozet` okunur (§7); `son` alanı son okumadan yeniyse cevaplar tam okunur (§12). Onaylanan cevap hemen işlenir: karar kaydı, uygulama, maddenin silinmesi, yeniden yayın.
+5. **"Bitti" demeden önce defter okunur.** Görevi bitmiş saymadan önce son kez "oku" çalışır (`cevap` ve `defter` koleksiyonları, §12). Cevaplanan maddede yapılacak iş varsa ona başlanır ve döngü tekrarlanır. Cevap gelmemiş ve iş ona bağlıysa durulur: sohbette tek satır "Defterde N madde cevabını bekliyor: `<bağlantı>`", sonra beklenir. Cevaba bağlı olmayan işler sürer.
 
 ## 1b. Bütçe dostu kullanım
 
@@ -37,7 +37,7 @@ Defterin maliyeti ajanın bağlamına giren metindir. Sayfanın kendisi büyükt
 | Madde eklemek, silmek | Kaynak JSON'u okuyup baştan yazmak | `defter-yap.py ekle` / `sil` |
 | Maddeleri görmek | JSON'u okumak | `defter-yap.py liste` (madde başına bir satır) |
 | Yeniden yayın | Maddeler sayfanın içinde; her turda sayfa değişir, yeni oturumda yayın koca bir farkla reddedilir | Sayfa sabit, maddeler `veri.json`'da; fark çıkmaz |
-| Cevap okumak | `defter` koleksiyonunu listelemek | `_ozet`, sonra `cevap` |
+| Cevap okumak | Belgeleri tek tek okumak | İki koleksiyonu `out_dir`'e listeleyip `defter-yap.py oku` |
 | Kılavuz | Bu dosyayı her seferinde baştan okumak | `SKILL.md` yeter; burada yalnız ilgili bölüm |
 | Ekran görüntüsü | Çektiği görüntüyü açıp bakmak | Maddeye koymak; yalnız doğrulamak gerekirse bakmak |
 | Yayın sıklığı | Her madde için ayrı yayın | Bir iş adımının maddelerini tek yayında toplamak |
@@ -174,7 +174,7 @@ Ne zaman: görev boyunca düzenli olarak ve görevi bitirmeden önce mutlaka (§
 
 Üç adımda, her adım bir öncekinden ucuz olduğu için sırayla:
 
-1. **Özet.** `read_db` get `defter/_ozet` → `{acik, bitti, senden, son}`. `bitti` ve `senden` sıfırsa okunacak bir şey yok, dur.
+1. **Özet.** `read_db` get `defter/_ozet` → `{acik, bitti, senden, taslak, son}`. `son` son okumandan eski değilse tam oku; sayılar sıfır diye durma (şablon 48 ve öncesi tamamlanmamış notu saymaz).
 2. **Cevaplar.** `read_db` list collection `cevap`. Her belge incedir, yalnız tamamlanmış maddeler:
 
 ```json
@@ -272,8 +272,8 @@ ArtifactData update url <Merkez url>  collection defterler  doc_id <defter doc_i
 - Merkez satırı: `{ad, url, proje, surum, acik, acil, son, durum, maddeler, kararlar}`. `maddeler` açık soruların kısa hâli (başlık, öneri, şıklar, maliyet rozeti, bekleme); `kararlar` son 30 karar.
 - Merkez cevabı `cevap/<defter doc_id>__<madde id>`: `{defter, id, q, choice, label, note, sinif, ret, at}`. Deftere `kaynak: "merkez"` ile geçer; sayfa onu Bitti'ye alır, "Merkez'den" rozeti çıkar.
 - Merkez'de cevap, ajan bir sonraki okumaya kadar "gönderildi" görünür (kullanıcı geri alabilir); ajan okuyunca "işlendi" olur. Defterde cevaplanan soru Merkez'den ajan okuyunca düşer.
-- `.merkez/` klasörü (ham cevaplar, okunan özeti) git'e girmez.
-- Bedeli: okuma başına birkaç yüz token (yalnız değişen cevap tam basılır), satır yazma 300 ile 600 token.
+- `.merkez/` klasörü (ham cevaplar, okunan özeti, bekleyenler) git'e girmez.
+- Bedeli: okuma başına birkaç yüz token (yalnız işlenmemiş cevap tam basılır; kapatılan bir daha basılmaz), satır yazma 300 ile 600 token.
 
 #### Eşitle (Drive köprüsü, sürüm 47)
 
@@ -410,3 +410,25 @@ Araştırma Defteri'nin kuralları ayrı beceride: `skills/arastirma/` (`SKILL.m
 | Dar ekran | Adım, dosya ve düz satırdaki uzun bağlantı alt satıra kırılır; sayfa yana taşmaz |
 | İletişim kuralı | Sohbette en çok üç satır; her rapor "Yaptım, Senin işin, Soru" ile başlar (SKILL) |
 | Eski cevaplar | 34 ve öncesi şablonlar cevabı yalnız `defter` koleksiyonunda tutar; `oku` öncesi o koleksiyondaki `done` belgeler de cevap sayılır |
+
+## 24. Sürüm 49 ile gelenler: cevap kaybolmaz
+
+Kullanıcının sorusu: "yazdığım bazı cevapları okumuyor, eski güncellenince tuhaf davranıyor". Dört yapısal neden bulundu ve kapatıldı.
+
+| Neden | Düzeltme |
+| --- | --- |
+| `oku`, cevabı basınca "okundu" sayıyordu; ajanın bağlamı kapanırsa cevap bir daha görünmüyordu | İşlenmemiş cevap kapatılana kadar her okumada tam basılır (`YENI`, `BEKLIYOR`) |
+| Tamamlanmamış maddeye yazılan not ajana hiç gitmiyordu | Sayfa onu `taslak: true` ile `cevap`a yazar; eski sayfalarda `oku` onu `defter` koleksiyonundan alır (`TASLAK`) |
+| Sayfa yalnız `veri.json`'dan okuyordu; ajan dosyayı yayına vermeyi unutunca eski liste görünüyordu | Maddeler sayfaya da gömülür; `veri.json` yoksa ya da eskiyse gömülü kopya gösterilir (`uretildi` damgası) |
+| Eski defterler yükseltilirken cevaplar ayrı koleksiyonda kalıyor, kaynak eski kalabiliyordu | `oku` iki koleksiyonu birlikte okur (`--eski` gerekmez); maddesi kaynakta olmayan cevap `UYARI` verir |
+
+#### Kapatma zorunlu
+
+Cevap işlenince madde `defter-yap.py kapat VERI.json D12 "ne yaptın"` ile kapanır. Karar kaydına `y` alanı yazılır; Merkez'in Kararlar sekmesinde "Ajan: …" satırı olarak görünür.
+
+Notlu, sorulu ya da retli bir cevabın maddesi `kapat` olmadan çıkarılırsa üreteç durur. Böylece kullanıcının her notu ya bir iş, ya bir yanıt olarak izde kalır.
+
+#### Ajana haber ver
+
+Mesaj tamamlanmamış notları da sayar: "tamamlanmamış notlar: D12, D14".
+

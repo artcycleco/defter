@@ -55,6 +55,7 @@ body.odak-kip .card .defter-adi{display:block}
 .karar{display:grid;grid-template-columns:auto minmax(0,1fr);overflow-wrap:anywhere;gap:2px 12px;padding:11px 2px;border-bottom:1px solid var(--line)}
 .karar .ne{font-weight:600}
 .karar .sonuc{grid-column:2;color:var(--ink-2);font-size:14px}
+.karar .yapilan{grid-column:2;color:var(--ink-2);font-size:13px}
 .karar .kim{grid-column:2;font-size:12px;color:var(--ink-3)}
 .karar .id{font-size:12px;font-weight:700;color:var(--ink-3);letter-spacing:.05em;padding-top:2px}
 .bos{border:1px dashed var(--line-2);border-radius:10px;padding:26px;color:var(--ink-3);text-align:center}
@@ -264,11 +265,11 @@ body.odak-kip #sorular .card.odak-bu{box-shadow:0 10px 40px rgba(0,0,0,.08)}
       const islem=o.arsiv?`<button class="btn ghost" data-arsiv="${esc(r.id)}" data-deger="0">Arşivden çıkar</button>`:(o.durgun(r)?`<button class="btn ghost" data-arsiv="${esc(r.id)}" data-deger="1" title="30 günden uzun süredir hareket yok">Arşive al</button>`:'');
       return `<tr><td class="ad-hucre"><a class="ad" href="${esc(r.url)}" target="_blank" rel="noopener">${esc(r.ad||r.id)}</a>${r.durum?`<div class="proje">${esc(r.durum)}</div>`:''}</td><td class="proje" data-e="Proje">${esc(r.proje||'')}</td><td data-e="Sürüm">${rz}</td><td class="sayi" data-e="Açık">${r.acik==null?'?':+r.acik}</td><td class="sayi${+r.acil?' acil-sayi':''}" data-e="Acil">${r.acil==null?'?':+r.acil}</td><td class="zaman" data-e="Son">${esc(once(r.son))}</td><td>${islem}</td></tr>`}).join('')+'</tbody></table></div>'}
   function kararListe(q){const L=[];
-    satirlar.forEach(r=>{(r.kararlar||[]).forEach(k=>L.push({r,id:k.id,t:k.t,l:k.l,at:k.at,tur:'karar'}));(r.maddeler||[]).forEach(m=>L.push({r,id:m.id,t:temiz(m.t),l:m.r?'Öneri: '+m.r:'cevap bekliyor',at:'',tur:'soru'}))});
+    satirlar.forEach(r=>{(r.kararlar||[]).forEach(k=>L.push({r,id:k.id,t:k.t,l:k.l,y:k.y,at:k.at,tur:'karar'}));(r.maddeler||[]).forEach(m=>L.push({r,id:m.id,t:temiz(m.t),l:m.r?'Öneri: '+m.r:'cevap bekliyor',at:'',tur:'soru'}))});
     Object.values(cevaplar).forEach(c=>{const r=satirlar.find(x=>x.id===c.defter);if(r&&!L.some(x=>x.r===r&&x.id===c.id&&x.tur==='karar'))L.push({r,id:c.id,t:c.q,l:c.label||c.note||'tamam',at:c.at,tur:'karar'})});
-    return L.filter(x=>!q||[x.id,x.t,x.l,x.r.ad].join(' ').toLocaleLowerCase('tr').includes(q)).sort((a,b)=>(a.tur===b.tur?0:a.tur==='soru'?1:-1)||String(b.at).localeCompare(String(a.at)))}
+    return L.filter(x=>!q||[x.id,x.t,x.l,x.y||'',x.r.ad].join(' ').toLocaleLowerCase('tr').includes(q)).sort((a,b)=>(a.tur===b.tur?0:a.tur==='soru'?1:-1)||String(b.at).localeCompare(String(a.at)))}
   function kararCiz(){const q=($('kararAra').value||'').trim().toLocaleLowerCase('tr');const F=kararListe(q).slice(0,q?200:60);
-    $('kararlar').innerHTML=F.length?F.map(x=>`<div class="karar"><span class="id">${esc(x.id)}</span><span class="ne">${inl(x.t)}</span><span class="sonuc">${x.tur==='soru'?'<span class="pill bekle">açık</span> ':''}${esc(x.l)}</span><span class="kim">${esc(x.r.ad||'')}${x.at?' · '+esc(once(x.at)):''}</span></div>`).join(''):`<div class="bos">${q?'Eşleşen karar yok.':'Ajanlar defterlerini okudukça son kararlar buraya gelir.'}</div>`}
+    $('kararlar').innerHTML=F.length?F.map(x=>`<div class="karar"><span class="id">${esc(x.id)}</span><span class="ne">${inl(x.t)}</span><span class="sonuc">${x.tur==='soru'?'<span class="pill bekle">açık</span> ':''}${esc(x.l)}</span>${x.y?`<span class="yapilan">Ajan: ${esc(x.y)}</span>`:''}<span class="kim">${esc(x.r.ad||'')}${x.at?' · '+esc(once(x.at)):''}</span></div>`).join(''):`<div class="bos">${q?'Eşleşen karar yok.':'Ajanlar defterlerini okudukça son kararlar buraya gelir.'}</div>`}
   // ── cevap gönder
   const bul=k=>{const [rid,mid]=k.split('__');const r=satirlar.find(x=>x.id===rid);const m=r&&(r.maddeler||[]).find(x=>x.id===mid);return m?[r,m]:[null,null]};
   const etiket=(m,ch)=>(Array.isArray(ch)?ch:[ch]).map(v=>((m.o||[]).find(o=>o.v===v)||{}).t||v).join(' · ');
