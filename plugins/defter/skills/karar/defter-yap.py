@@ -155,6 +155,10 @@ def yapisal(veri):
     for sf in veri.get("sayfalar") or []:
         if not (isinstance(sf, dict) and sf.get("id") and sf.get("ad")):
             hata.append("sayfalar: her sayfa {id, ad, body} olmali")
+        elif sf.get("durum") not in (None, "acik", "kapali"):
+            hata.append("sayfalar %s: durum yalniz \"acik\" ya da \"kapali\"" % sf.get("id"))
+        elif sf.get("durum") == "kapali" and not sf.get("kosul"):
+            uyari.append("sayfalar %s: kapali sayfanin \"kosul\"u yok (ne zaman acilacagini yaz)" % sf.get("id"))
     for k in veri.get("kaynakca") or []:
         if not (isinstance(k, dict) and k.get("baslik")):
             hata.append("kaynakca: her kaynakta en az baslik olmali")

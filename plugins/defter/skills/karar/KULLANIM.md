@@ -432,3 +432,15 @@ Notlu, sorulu ya da retli bir cevabın maddesi `kapat` olmadan çıkarılırsa �
 
 Mesaj tamamlanmamış notları da sayar: "tamamlanmamış notlar: D12, D14".
 
+## 25. Sürüm 50 ile gelenler: yalnız gereken sayfa açık
+
+Kullanıcının isteği (Araştırma Atölyesi): sekmeler sığmıyor, kontrol etmesi zor; ihtiyaç olan açılsın, token yiyen sorulsun, baştakiler önden onaylı gelsin.
+
+| Alan | Ne yapar |
+| --- | --- |
+| `"durum": "kapali"` | Sayfa sekme çubuğunda durmaz; "Diğer (N)" sekmesinde listelenir, Göster ile okunur |
+| `"kosul"` | Ne zaman açılacağı; "Diğer"de "Açılır: …" diye görünür |
+| `"m"` | Açmanın maliyeti; yüksekse ajan açmadan önce tek ✎ maddeyle sorar |
+
+Ajan kapalı sayfayı güncellemez. Koşul gelince (o derse dair iş başlayınca gibi) `durum`u siler, sayfa sekmeye çıkar. Başta onaylanan sayfalar sormadan açılır; ajan aynı tür için tekrar sormaz. Sekme çubuğu taşınca yana kayar.
+

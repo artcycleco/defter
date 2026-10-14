@@ -24,7 +24,7 @@ Sayfa, üreteç ve genel kurallar `karar` becerisi (projede `defter-karar`)ndedi
 | Alan | Ne |
 | --- | --- |
 | `"silinmez": true` | Madde silinmez, tarihle arşive geçer; cevaplar ve kararlar kalır |
-| `sayfalar` | Strateji, ders sayfaları, Takvim ve "Yapay zekâ beyanı" okuma sekmeleri |
+| `sayfalar` | Strateji, ders sayfaları, Takvim ve "Yapay zekâ beyanı" okuma sekmeleri. Yalnız gereken açık: ders sayfası o derse dair iş başlayınca açılır (`"durum": "kapali"`, `"kosul"`), pahalı sayfa açılmadan sorulur, başta onaylananlar sormadan açılır |
 | `kaynakca` | Onaylanan kaynaklar: `{baslik, yazar, yil, dergi, doi, url, grup, neden, guven, dogrulandi}` |
 | Aday kartı | Her aday bir ✎ madde: Kabul, Ret, Sonra, Özet iste (`m: yüksek`) |
 
