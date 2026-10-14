@@ -17,7 +17,11 @@ Oku:     python3 defter-yap.py oku VERI.json --url DEFTER_URL --cevap KLASOR [--
          tamamlanmamis notlari (taslak) ve kullanicinin ekledigi maddeleri (UG-) tasir; hep birlikte okunur.
          Islenmemis her cevabi HER okumada tam basar (kapatilana kadar); Merkez'den gelenleri defter icin hazirlar;
          Merkez satirini .merkez/AD/ altina yazar ve yapilacak yazmalari basar. --eski KLASOR eski adidir, hala gecer.
-Goster:  python3 defter-yap.py goster VERI.json D31 [D32]         (tek maddeyi kisa basar; JSON'u okumadan)
+Goster:  python3 defter-yap.py goster VERI.json D31 [S4]          (tek maddeyi ya da senaryo sahnesini kisa basar)
+Senaryo: python3 defter-yap.py sahne VERI.json S4 Alan "metin"      (sahne alani; Alan: ad, bagli, ya da Goruntu, Ses...; "-" siler)
+         python3 defter-yap.py sahne-ekle VERI.json BOLUM S11 "Ad" [--sonra S10]
+         python3 defter-yap.py surum VERI.json 0.3 "ne degisti"      (senaryo surumu ve degisiklik gunlugu)
+Ice al:  python3 defter-yap.py ice-al SAYFA.html VERI.json            (yayindaki sayfanin icindeki maddeleri kaynak JSON'a cikarir)
 Yanitla: python3 defter-yap.py yanitla VERI.json D31 "soru" "yanit"   (acik maddeye yanit; madde acik kalir)
 Kapat:   python3 defter-yap.py kapat VERI.json D31 "ne yaptin" [D32 "ne yaptin" ...]
          cevabi islenen maddeyi kaynaktan cikarir (silinmezde arsive) ve karar kaydina ne yaptigini (y) yazar.
@@ -305,7 +309,15 @@ def goster(veri_yolu, ids):
     for iid in ids:
         m = mm.get(iid)
         if not m:
-            print("%s: yok" % iid)
+            b, sh = _sahne_bul(veri.get("senaryo") or {}, iid)
+            if sh is None:
+                print("%s: yok" % iid)
+                continue
+            print("%s · %s  (%s)" % (iid, sh.get("ad", ""), b.get("ad", "")))
+            for k, v in (sh.get("alanlar") or {}).items():
+                print("  %s: %s" % (k, _kisa(v, 300)))
+            if sh.get("bagli"):
+                print("  bagli: " + ", ".join(sh["bagli"]))
             continue
         print("%s | %s | %s | %s" % (iid, m.get("type"), m.get("priority"), m.get("title")))
         if m.get("why"):
@@ -353,6 +365,139 @@ def sil(veri_yolu, ids):
     veri["items"] = [m for m in veri["items"] if str(m.get("id")) not in ids]
     yaz(veri_yolu, veri)
     print("silindi: %d madde  (kalan %d)" % (once - len(veri["items"]), len(veri["items"])))
+
+
+def _senaryo_md(s, maddeler):
+    """Yapilandirilmis senaryodan okunur metin: baslik, bilgi tablosu, logline, bolumler, sahneler, acik sorular."""
+    sat = ["# " + s.get("ad", "Senaryo"), "", "**Senaryo · sürüm %s%s**" % (s.get("surum", "0.1"), (" · " + s["tarih"]) if s.get("tarih") else ""), ""]
+    if s.get("bilgi"):
+        sat += ["| | |", "| --- | --- |"] + ["| %s | %s |" % (k, str(v).replace("|", "/")) for k, v in s["bilgi"].items()] + [""]
+    for bas, alan in (("Logline", "logline"), ("Ana fikir", "ana_fikir")):
+        if s.get(alan):
+            sat += ["#### " + bas, "", s[alan], ""]
+    acik = {}
+    for b in s.get("bolumler") or []:
+        sat += ["## " + b.get("ad", "") + ((" (" + b["zaman"] + ")") if b.get("zaman") else ""), ""]
+        for sh in b.get("sahneler") or []:
+            sat += ["#### %s · %s" % (sh.get("id"), sh.get("ad", "")), ""]
+            for k, v in (sh.get("alanlar") or {}).items():
+                sat.append("- **%s:** %s" % (k, v))
+            bag = [x for x in sh.get("bagli") or [] if x in maddeler]
+            if bag:
+                sat.append("- **Bağlı karar:** " + ", ".join("[%s]" % x for x in bag))
+                for x in bag:
+                    acik.setdefault(x, []).append(sh.get("id"))
+            sat.append("")
+    if s.get("karakterler"):
+        sat += ["## Karakterler", ""] + ["- **%s**%s%s" % (k.get("ad"), (", " + k["rol"]) if k.get("rol") else "", (": " + k["not"]) if k.get("not") else "") for k in s["karakterler"]] + [""]
+    if acik:
+        sat += ["## Açık sorular", "", "| Madde | Soru | Sahne |", "| --- | --- | --- |"]
+        sat += ["| [%s] | %s | %s |" % (x, re.sub(r"^[✎⚙ⓘ▤☐]\s*", "", str(maddeler[x].get("title", ""))).replace("|", "/"), ", ".join(v)) for x, v in acik.items()] + [""]
+    return "\n".join(sat).strip() + "\n"
+
+
+def senaryo_isle(veri, cikti_yolu):
+    """senaryo alani varsa: Senaryo ve Degisiklikler sayfalarini uretir, md disa aktarimini ekler klasorune yazar.
+    Ajan senaryonun tamamini hic yazmaz ya da okumaz; sahne komutlariyla tek alan degistirir."""
+    s = veri.get("senaryo")
+    if not isinstance(s, dict):
+        return veri, {}
+    maddeler = {str(m.get("id")): m for m in veri.get("items") or []}
+    metin = _senaryo_md(s, maddeler)
+    kok = pathlib.Path(cikti_yolu).resolve().parent
+    ad = "senaryo-%s.md" % re.sub(r"[^\w.-]", "", str(s.get("surum", "0.1")))
+    yol = kok / "ekler" / str(veri["id"]) / ad
+    yol.parent.mkdir(parents=True, exist_ok=True)
+    io.open(yol, "w", encoding="utf-8").write(metin)
+    goreli = "ekler/%s/%s" % (veri["id"], ad)
+    sayfalar = [x for x in veri.get("sayfalar") or [] if x.get("id") not in ("senaryo", "degisiklikler")]
+    govde = metin.split("\n", 2)[2] if metin.startswith("# ") else metin
+    sayfalar.insert(0, {"id": "senaryo", "ad": "Senaryo " + str(s.get("surum", "")), "body": "[Metni indir (md)](%s)\n\n" % goreli + govde})
+    if s.get("gunluk"):
+        sayfalar.append({"id": "degisiklikler", "ad": "Değişiklikler", "durum": "kapali", "kosul": "Sürüm geçmişine bakmak istediğinde",
+                         "body": "\n".join("- **%s** (%s): %s" % (g.get("surum", ""), g.get("tarih", ""), g.get("ne", "")) for g in reversed(s["gunluk"]))})
+    veri = dict(veri, sayfalar=sayfalar)
+    veri.pop("senaryo", None)   # sayfaya yalniz uretilen metin gider
+    try:
+        rel = str(yol.relative_to(pathlib.Path.cwd().resolve()))
+    except ValueError:
+        rel = str(yol)
+    return veri, {goreli: rel}
+
+
+def _sahne_bul(s, sid):
+    for b in s.get("bolumler") or []:
+        for sh in b.get("sahneler") or []:
+            if str(sh.get("id")) == sid:
+                return b, sh
+    return None, None
+
+
+def sahne(veri_yolu, sid, alan, metin):
+    veri = oku(veri_yolu)
+    s = veri.get("senaryo")
+    if not isinstance(s, dict):
+        sys.exit("sahne: kaynakta senaryo alani yok")
+    b, sh = _sahne_bul(s, sid)
+    if sh is None:
+        sys.exit("sahne: %s yok (yeni sahne icin sahne-ekle)" % sid)
+    if alan == "ad":
+        sh["ad"] = metin
+    elif alan == "bagli":
+        sh["bagli"] = [x.strip() for x in metin.split(",") if x.strip()]
+    elif metin == "-":
+        (sh.get("alanlar") or {}).pop(alan, None)
+    else:
+        sh.setdefault("alanlar", {})[alan] = metin
+    yaz(veri_yolu, veri)
+    print("sahne %s: %s guncellendi" % (sid, alan))
+
+
+def sahne_ekle(veri_yolu, bolum, sid, ad, sonra=None):
+    veri = oku(veri_yolu)
+    s = veri.setdefault("senaryo", {"ad": veri.get("title", "Senaryo").split(";")[0], "surum": "0.1", "bolumler": []})
+    if _sahne_bul(s, sid)[1] is not None:
+        sys.exit("sahne-ekle: %s zaten var" % sid)
+    bl = s.setdefault("bolumler", [])
+    i = int(bolum) - 1
+    while len(bl) <= i:
+        bl.append({"ad": "Bölüm %d" % (len(bl) + 1), "sahneler": []})
+    sh = bl[i].setdefault("sahneler", [])
+    yeni = {"id": sid, "ad": ad, "alanlar": {}}
+    k = next((j + 1 for j, x in enumerate(sh) if str(x.get("id")) == sonra), len(sh)) if sonra else len(sh)
+    sh.insert(k, yeni)
+    yaz(veri_yolu, veri)
+    print("sahne eklendi: %s (bolum %s, %d. sira)" % (sid, bolum, k + 1))
+
+
+def surum(veri_yolu, no, ne):
+    veri = oku(veri_yolu)
+    s = veri.get("senaryo")
+    if not isinstance(s, dict):
+        sys.exit("surum: kaynakta senaryo alani yok")
+    bugun = datetime.date.today().isoformat()
+    s["surum"], s["tarih"] = str(no), bugun
+    s.setdefault("gunluk", []).append({"surum": str(no), "tarih": bugun, "ne": _kisa(ne, 300)})
+    yaz(veri_yolu, veri)
+    print("senaryo surumu %s (%s)" % (no, bugun))
+
+
+def ice_al(sayfa_yolu, veri_yolu):
+    """Yayindaki sayfadan maddeleri kaynak JSON'a cikarir (sohbet ortaminda kaynak yoksa ya da eski defter yukseltilirken)."""
+    t = io.open(sayfa_yolu, encoding="utf-8").read()
+    m = re.search(r'<script type="application/json" id="defter">\s*(.*?)\s*</script>', t, re.S)
+    if not m:
+        sys.exit("ice-al: sayfada defter verisi yok")
+    v = json.loads(m.group(1).replace("<\\/", "</"))
+    if v.get("veri") and not v.get("items"):
+        sys.exit("ice-al: bu sayfa maddeleri ayri dosyada tutuyor (%s); o dosyayi Artifact read ile al, kaynak olarak kullan" % v["veri"])
+    for k in ("veri", "uretildi", "merkez", "repo", "dal"):
+        v.pop(k, None)
+    if pathlib.Path(veri_yolu).exists():
+        sys.exit("ice-al: %s zaten var; ustune yazmam" % veri_yolu)
+    pathlib.Path(veri_yolu).parent.mkdir(parents=True, exist_ok=True)
+    yaz(veri_yolu, v)
+    print("ice alindi: %s (%d madde)" % (veri_yolu, len(v.get("items") or [])))
 
 
 def liste(veri_yolu):
@@ -511,6 +656,7 @@ def uret(veri_yolu, cikti_yolu, sablon=SABLON, tek=False):
         dep = _depo(veri_yolu)
         if dep:
             veri = dict(veri, repo=dep[0], dal=dep[1])
+    veri, sen_harita = senaryo_isle(veri, cikti_yolu)
     hata, yapi_uyari = yapisal(veri)
     kapanis_denetle(veri, veri_yolu, hata, yapi_uyari)
     if not veri.get("url") and pathlib.Path(cikti_yolu).exists():
@@ -520,6 +666,7 @@ def uret(veri_yolu, cikti_yolu, sablon=SABLON, tek=False):
     if "—" in gorunen:
         sys.exit("uzun tire (—) yasak; noktali virgul veya parantez kullan")
     m_hata, m_uyari, harita = medya_denetle(veri, cikti_yolu)
+    harita.update(sen_harita)
     hata += m_hata
     yapi_uyari += m_uyari
     for u in yapi_uyari:
@@ -819,6 +966,14 @@ if __name__ == "__main__":
         ekle(a[1], a[2])
     elif a[:1] == ["sil"] and len(a) >= 3:
         sil(a[1], a[2:])
+    elif a[:1] == ["sahne"] and len(a) == 5:
+        sahne(a[1], a[2], a[3], a[4])
+    elif a[:1] == ["sahne-ekle"] and len(a) >= 5:
+        sahne_ekle(a[1], a[2], a[3], a[4], a[a.index("--sonra") + 1] if "--sonra" in a else None)
+    elif a[:1] == ["surum"] and len(a) == 4:
+        surum(a[1], a[2], a[3])
+    elif a[:1] == ["ice-al"] and len(a) == 3:
+        ice_al(a[1], a[2])
     elif a[:1] == ["goster"] and len(a) >= 3:
         goster(a[1], a[2:])
     elif a[:1] == ["yanitla"] and len(a) == 5:

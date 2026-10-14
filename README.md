@@ -10,6 +10,7 @@ Claude sana sohbette dağınık soru sormaz; soruları, kendi verdiği teknik ka
 | --- | --- |
 | `/defter:karar` (projede `/defter-karar`) | Karar defteri: soru, dosya sunumu, cevap okuma, Defter Merkezi |
 | `/defter:arastirma` (projede `/defter-arastirma`) | Araştırma defteri: tez ve akademik kaynak taraması için silinmez defter |
+| `/defter:senaryo` (projede `/defter-senaryo`) | Senaryo defteri: film ya da sahne sahne ilerleyen bir anlatı; senaryo sekmesi, sürümler, md dışa aktarım |
 
 İki noktalı biçim eklentiden gelir (Claude eklenti komutlarını böyle adlandırır); projeye kopyalanan beceride tireli biçim kullanılır.
 

@@ -1,0 +1,54 @@
+---
+name: senaryo
+description: Senaryo Defteri; film, video, animasyon, sergi kurgusu ya da sahne sahne ilerleyen bir anlatının senaryosunu kullanıcıyla birlikte geliştirmek için. "senaryo defteri", "senaryo yaz", "senaryoyu geliştir", "sahne", "storyboard", "/defter:senaryo" ya da "/defter-senaryo" dendiğinde kullan. Sayfa ve üreteç `karar` becerisi (projede `defter-karar`)nden gelir; bu beceri senaryonun yapısını ve kurallarını verir.
+---
+> Kaynak: `github.com/artcycleco/defter` (açık repo), `plugins/defter/skills/senaryo/`. Komut: eklentide `/defter:senaryo`, projeye kopyalanmışsa `/defter-senaryo`.
+
+Senaryo defteri bir karar defteridir; ek olarak senaryonun kendisi kaynakta yapılandırılmış durur. Üreteç ondan okunur bir **Senaryo** sekmesi ve indirilebilir `senaryo-<sürüm>.md` üretir. Senaryoyu sen bir kez, sahne sahne yazarsın; tam metni hiçbir turda yeniden yazmaz ve okumazsın.
+
+| Dosya | Ne |
+| --- | --- |
+| `${CLAUDE_SKILL_DIR}/../karar/SKILL.md` (eklenti) ya da `${CLAUDE_SKILL_DIR}/../defter-karar/SKILL.md` (proje kopyası) | Defterin bütün akışı: açmak, yayın, okuma, kapatma. Önce onu oku. |
+| `${CLAUDE_SKILL_DIR}/ornek-senaryo.json` | Yeni senaryo defteri için iskelet |
+
+Üreteç: `defter-yap.py` (defter becerisinin klasöründe ya da projede `scripts/defter-yap.py`).
+
+## Yapı
+Kaynak JSON'da `"senaryo"` alanı:
+
+```json
+{"ad": "Modern Sanatçının Öyküsü", "surum": "0.1", "tarih": "2026-10-12",
+ "bilgi": {"Süre": "60 ile 90 saniye", "Kadraj": "Dikey; finalde yataya açılma [O4]"},
+ "logline": "Tek cümle", "ana_fikir": "Bir paragraf",
+ "bolumler": [{"ad": "Bölüm 1 · Sanatçının Öyküsü", "zaman": "0:00 ile 0:30",
+   "sahneler": [{"id": "S1", "ad": "Mağara", "alanlar": {"Görüntü": "...", "Ses": "...", "Işık": "..."}, "bagli": ["O3"]}]}],
+ "karakterler": [{"ad": "Sanatçı", "rol": "ana", "not": "..."}],
+ "gunluk": [{"surum": "0.1", "tarih": "2026-10-12", "ne": "İlk taslak"}]}
+```
+
+- Sahne id'si `S` ve sayı; karar maddeleri başka önekle (`O1`, `D1`) ki karışmasın.
+- Sahne alanları serbesttir; her sahnede aynı adlar kullanılır (Görüntü, Ses, Işık, Kadraj, Not, Üretim).
+- Bir sahne bir karara bağlıysa `bagli`: o maddenin id'si. Senaryo sayfası sahnenin altına "Bağlı karar: [O3]" yazar ve sonda "Açık sorular" tablosunu kendisi kurar; madde kapanınca bağ düşer.
+- Metinde `[O3]` yazdığın her yer sayfada tıklanır, maddeye gider.
+
+## Komutlar (kaynak JSON'u okumadan)
+```bash
+python3 <üreteç> sahne VERI.json S4 Görüntü "Gece, modern bir oda..."   # bir alanı yaz ya da değiştir ("-" siler)
+python3 <üreteç> sahne VERI.json S4 ad "Yeni ateş"                        # sahne adı
+python3 <üreteç> sahne VERI.json S4 bagli "O3,O7"                         # bağlı kararlar
+python3 <üreteç> sahne-ekle VERI.json 2 S11 "Yeni sahne" --sonra S7       # 2. bölüme, S7'den sonra
+python3 <üreteç> goster VERI.json S4                                       # tek sahneyi gör
+python3 <üreteç> surum VERI.json 0.2 "O2, O3 ve O4 cevaplarıyla"          # sürüm ve değişiklik günlüğü
+```
+
+## Akış
+1. **Aç:** iskeletten başla; logline, bölümler, sahneler (kısa), açık kararlar ✎ madde olarak. Her karar maddesinin `why`'ında hangi sahneyi etkilediğini yaz.
+2. **Cevap gelince** ("oku" defter becerisinde): kararı ilgili sahnelere `sahne` komutuyla işle, maddeyi `kapat` ile kapat, sonra `surum` ile sürümü artır (bir turdaki bütün cevaplar tek sürüm). Bir sonraki taslakta ne değiştiğini `surum`un cümlesi söyler; ayrı rapor yazma.
+3. **Sahneye not:** kullanıcı bir sahneye dair not yazarsa (rapor ya da madde notu), yalnız o sahneyi `goster` ile aç, değiştir.
+4. **Görsel:** kare, storyboard, kadraj şeması `ekler`e; görünüş kararı defter becerisindeki "Görünüş" kuralıyla sorulur.
+
+## Kurallar
+- Senaryonun tam metnini maddeye, rapora ya da sohbete kopyalama; Senaryo sekmesi ve md dosyası onu taşır.
+- Telif ve izin gerektiren şey (şarkı, alıntı, gerçek kişi) ✎ madde olur ve `risk: "dis"` alır; hukuki görüş verme, kontrol edilmesini söyle.
+- Kişisel bilgi ve gerçek kişiler için defter becerisinin onay kuralı geçerlidir.
+- Değişiklikler sayfası kapalı durur (token yok); geçmiş istenince açılır.

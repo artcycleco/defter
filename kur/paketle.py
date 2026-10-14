@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""claude.ai Beceriler icin zip'ler: defter-karar.zip ve defter-arastirma.zip (repo kokunde). Kullanim: python3 kur/paketle.py"""
+"""claude.ai Beceriler icin zip'ler: defter-karar.zip, defter-arastirma.zip ve defter-senaryo.zip (repo kokunde). Kullanim: python3 kur/paketle.py"""
 import pathlib, re, zipfile
 KOK = pathlib.Path(__file__).resolve().parent.parent
 BEC = KOK / "plugins" / "defter" / "skills"
-for ad, zad in (("karar", "defter-karar"), ("arastirma", "defter-arastirma")):
+for ad, zad in (("karar", "defter-karar"), ("arastirma", "defter-arastirma"), ("senaryo", "defter-senaryo")):
     hedef = KOK / (zad + ".zip")
     with zipfile.ZipFile(hedef, "w", zipfile.ZIP_DEFLATED) as z:
         for f in sorted((BEC / ad).rglob("*")):

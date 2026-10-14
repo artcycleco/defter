@@ -1,11 +1,12 @@
 # Kurulum: Karar Defteri ve Araştırma Defteri
 
-Bu repoda iki beceri var. İkisi aynı sayfayı (şablon) ve aynı üreteci kullanır; araştırma becerisi tez ve kaynak işinin kurallarını ekler.
+Bu repoda üç beceri var. Üçü aynı sayfayı (şablon) ve aynı üreteci kullanır; araştırma becerisi tez ve kaynak işinin, senaryo becerisi sahne sahne ilerleyen bir anlatının kurallarını ekler.
 
 | Beceri | Klasör | Zip |
 | --- | --- | --- |
 | `defter` (Karar Defteri; açık eklentide `karar`) | `plugins/defter/skills/karar/` | `defter-beceri.zip` |
 | `arastirma` (Araştırma Defteri) | `plugins/defter/skills/arastirma/` | `arastirma-beceri.zip` |
+| `senaryo` (Senaryo Defteri) | `plugins/defter/skills/senaryo/` | `senaryo-beceri.zip` |
 
 Araştırma becerisi tek başına çalışmaz; üreteç ve sayfa `karar` becerisi (projede `defter-karar`)ndedir. Bu yüzden ikisi her yere birlikte yüklenir.
 
@@ -18,14 +19,14 @@ Araştırma becerisi tek başına çalışmaz; üreteç ve sayfa `karar` beceris
 | claude.ai/code bulut oturumu | 3. Projeye kopya |
 | Claude Science | 4. Science |
 
-Herkese açık eklenti `github.com/artcycleco/defter` reposundadır; adı **Defter**, pazar adı `artcycle`. Komutlar `/defter:karar` ve `/defter:arastirma`.
+Herkese açık eklenti `github.com/artcycleco/defter` reposundadır; adı **Defter**, pazar adı `artcycle`. Komutlar `/defter:karar`, `/defter:arastirma` ve `/defter:senaryo`.
 
 ## 1. claude.ai, Claude uygulaması, Cowork: eklenti
 
 Bir kez yapılır; hesaba bağlıdır, bütün sohbetlerde ve uygulamalarda görünür.
 
 1. claude.ai'da **Customize → Plugins → Add → Add marketplace**, adres `artcycleco/defter`.
-2. Listeden **Defter**'i kur. **Customize → Skills**'te `karar` ve `arastirma` görünür.
+2. Listeden **Defter**'i kur. **Customize → Skills**'te `karar`, `arastirma` ve `senaryo` görünür.
 3. Eski **Karar defteri** eklentisi ya da elle yüklenmiş `defter` zip'i duruyorsa kaldır; iki kopya yan yana durmasın.
 
 Zip yolu (eklenti kuramayan hesaplar için): repo kökündeki iki zip'i **Customize → Skills → Upload skill** ile yükle. Bulut oturumunda zip'in yanındaki dosyalar gelmez; orada 3. yolu kullan.
@@ -65,6 +66,7 @@ Kurulunca projede şunlar olur:
 | --- | --- |
 | `.claude/skills/defter-karar/` | Karar Defteri becerisi (şablon, üreteç, kılavuz) |
 | `.claude/skills/defter-arastirma/` | Araştırma becerisi (protokol, örnek defter) |
+| `.claude/skills/defter-senaryo/` | Senaryo becerisi (örnek senaryo defteri) |
 | `scripts/defter-yap.py` | Üretece kısa yönlendirme |
 | `.claude/settings.json` | Oturum başı kancası: kaynakta yeni sürüm varsa kopyayı tazeler |
 | `.gitignore` | `.merkez/` (okuma önbelleği git'e girmez) |
@@ -88,6 +90,7 @@ Science'taki ajan aday kaynakları Drive'da `Araştırma/aday` klasörüne `aday
 | --- | --- |
 | Karar defteri | "defter aç" ya da "/defter-karar" |
 | Araştırma defteri | "araştırma defteri aç"; iskelet `arastirma/ornek-arastirma.json` |
+| Senaryo defteri | "senaryo defteri aç"; iskelet `senaryo/ornek-senaryo.json` |
 | Cevapları işlet | "defteri oku" |
 | Eski defteri yeni şablona taşı | "defteri yükselt" |
 

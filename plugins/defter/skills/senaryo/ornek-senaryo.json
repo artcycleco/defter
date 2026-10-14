@@ -1,0 +1,123 @@
+{
+ "id": "kisa-film",
+ "title": "Kısa film; senaryo defteri",
+ "agent": "Senaryo ajanı",
+ "date": "2026-10-14",
+ "purpose": "Kısa filmin senaryosunu kararlarla birlikte geliştirmek.",
+ "senaryo": {
+  "ad": "Kısa Film",
+  "surum": "0.1",
+  "tarih": "2026-10-14",
+  "bilgi": {
+   "Süre": "60 saniye",
+   "Kadraj": "Yatay 16:9",
+   "Müzik": "Özgün [K2]"
+  },
+  "logline": "Tek cümlelik özet.",
+  "ana_fikir": "Filmin söylemek istediği, bir paragraf.",
+  "bolumler": [
+   {
+    "ad": "Bölüm 1 · Açılış",
+    "zaman": "0:00 ile 0:20",
+    "sahneler": [
+     {
+      "id": "S1",
+      "ad": "İlk görüntü",
+      "alanlar": {
+       "Görüntü": "...",
+       "Ses": "..."
+      },
+      "bagli": [
+       "K1"
+      ]
+     },
+     {
+      "id": "S2",
+      "ad": "Karşılaşma",
+      "alanlar": {
+       "Görüntü": "...",
+       "Not": "..."
+      }
+     }
+    ]
+   },
+   {
+    "ad": "Bölüm 2 · Kapanış",
+    "zaman": "0:20 ile 1:00",
+    "sahneler": [
+     {
+      "id": "S3",
+      "ad": "Son kare",
+      "alanlar": {
+       "Görüntü": "...",
+       "Kapanış": "Yazı olacak mı [K2]"
+      },
+      "bagli": [
+       "K2"
+      ]
+     }
+    ]
+   }
+  ],
+  "karakterler": [
+   {
+    "ad": "Anlatıcı",
+    "rol": "ana",
+    "not": "Görünmez; yalnız ses"
+   }
+  ],
+  "gunluk": [
+   {
+    "surum": "0.1",
+    "tarih": "2026-10-14",
+    "ne": "İlk taslak"
+   }
+  ]
+ },
+ "items": [
+  {
+   "id": "K1",
+   "priority": 2,
+   "type": "design",
+   "title": "✎ İlk görüntü hangisi olsun?",
+   "why": "Filmin tonunu ilk kare kurar; S1'i belirler.",
+   "options": [
+    {
+     "v": "a",
+     "t": "Yakın plan, el",
+     "d": "Kişisel, sessiz bir açılış."
+    },
+    {
+     "v": "b",
+     "t": "Geniş plan, mekân",
+     "d": "Dünyayı önce gösterir."
+    }
+   ],
+   "rec": "Önerim a: film kişisel bir yerden başlasın.",
+   "recv": "a",
+   "acildi": "2026-10-14T19:54:11Z"
+  },
+  {
+   "id": "K2",
+   "priority": 3,
+   "type": "design",
+   "title": "✎ Kapanışta yazı olsun mu?",
+   "why": "S3'ün son karesini belirler.",
+   "options": [
+    {
+     "v": "a",
+     "t": "Yazısız",
+     "d": "Görüntüyle biter."
+    },
+    {
+     "v": "b",
+     "t": "Yalnız başlık",
+     "d": "Filmin adı belirir."
+    }
+   ],
+   "rec": "Önerim b.",
+   "recv": "b",
+   "acildi": "2026-10-14T19:54:11Z"
+  }
+ ]
+}

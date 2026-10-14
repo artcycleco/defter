@@ -48,13 +48,14 @@ def kopyala(kaynak, hedef):
         shutil.rmtree(hedef)
     shutil.copytree(kaynak, hedef, ignore=shutil.ignore_patterns("__pycache__"))
     ad_duzelt(hedef)
-    # kardes beceri (arastirma) defterle birlikte tasinir
-    ka, ha = kaynak.parent / "arastirma", hedef.parent / "defter-arastirma"
-    if ka.is_dir() and ka.resolve() != ha.resolve():
-        if ha.exists():
-            shutil.rmtree(ha)
-        shutil.copytree(ka, ha, ignore=shutil.ignore_patterns("__pycache__"))
-        ad_duzelt(ha)
+    # kardes beceriler (arastirma, senaryo) defterle birlikte tasinir
+    for kardes, kad in (("arastirma", "defter-arastirma"), ("senaryo", "defter-senaryo")):
+        ka, ha = kaynak.parent / kardes, hedef.parent / kad
+        if ka.is_dir() and ka.resolve() != ha.resolve():
+            if ha.exists():
+                shutil.rmtree(ha)
+            shutil.copytree(ka, ha, ignore=shutil.ignore_patterns("__pycache__"))
+            ad_duzelt(ha)
 
 
 def kaynaktan_cek():

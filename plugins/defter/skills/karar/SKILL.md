@@ -28,6 +28,7 @@ Normal iş için yalnız bu dosya yeter. Başka dosyayı yalnız aşağıda adı
 
 ## Kipler
 - "aç" ya da "kullan": yeni defter ya da var olana madde. "oku": cevapları işle. "yükselt": eski defteri yeni şablona taşı. "güncelle": beceriyi kaynaktan yenile.
+- Akademik kaynak araştırması ve tez: `arastirma` becerisi; film ya da sahne sahne ilerleyen anlatı: `senaryo` becerisi (yüklüyse). İkisi de bu dosyanın akışını kullanır.
 - Yalnız komut yazıldıysa (konu yok): projede `docs/defterler/veri/*.json` varsa "oku"; yoksa konu uydurma, tek satır sor: "Hangi konuda defter açayım?"
 
 ## Sohbet kısa, ayrıntı defterde
@@ -129,6 +130,7 @@ Cevap 24 saat taslaktır: `risk` `dis` ya da `donulmez` olan işi `kesin` gelmed
 ## "yükselt" ve "güncelle"
 - Yükselt: kaynak JSON aynı; önce "oku" (cevap kaybolmasın), sonra yeni şablonla üret, aynı bağlantıya yayınla. İlk ince yayında platform eski kalın sayfayı bir kez geri verir; bu bir kezlik bedeldir.
 - Başka oturumun defterini yükseltirken kaynak canlı sayfadan eski olabilir: `oku` UYARI verirse önce canlıyı al.
+- Kaynak JSON yoksa (sohbet ortamı, başka oturumun defteri): canlı sayfayı Artifact read ile kaydet, `defter-yap.py ice-al SAYFA.html docs/defterler/veri/<ad>.json` maddeleri kaynağa çıkarır. Sayfa maddeleri ayrı `veri.json`'da tutuyorsa (şablon 50 ve öncesi) o dosyayı oku; kaynak odur.
 - Kapanmış defter: kaynağa `"kapandi": "YYYY-AA-GG"`; kanca onu bildirmez, yükseltilmez.
 - Güncelle: kaynak repoyu çek, `kur/projeye-kur.py` çalıştır, bu dosyayı yeniden oku.
 

@@ -2,7 +2,7 @@
 """Defter becerisini bir projeye kurar ya da gunceller (bulut oturumlari icin sart).
 
 Kullanim:  python3 kur/projeye-kur.py <proje koku>
-Yaptigi:   1) <proje>/.claude/skills/defter-karar/ ve arastirma/ = bu reponun beceri klasorlerinin kopyasi
+Yaptigi:   1) <proje>/.claude/skills/defter-karar/, arastirma/ ve senaryo/ = bu reponun beceri klasorlerinin kopyasi
            2) <proje>/scripts/defter-yap.py = ureteç yonlendirmesi (eski komutlar calismaya devam eder)
            3) eski defter dosyalarinin yerine kisa yonlendirme koyar, eski kopyalari siler
 """
@@ -55,13 +55,16 @@ def kur(proje):
     shutil.copytree(BECERI, hedef)
     ad_duzelt(hedef)
     print("[ok] beceri  -> %s (sablon surumu %s)" % (hedef.relative_to(proje), surum()))
-    if ARASTIRMA.is_dir():
-        h2 = proje / ".claude" / "skills" / "defter-arastirma"
+    for kardes, kad in (("arastirma", "defter-arastirma"), ("senaryo", "defter-senaryo")):   # kardes beceriler defterle birlikte gelir
+        kb = ARASTIRMA.parent / kardes
+        if not kb.is_dir():
+            continue
+        h2 = proje / ".claude" / "skills" / kad
         if h2.exists():
             shutil.rmtree(h2)
-        shutil.copytree(ARASTIRMA, h2)
+        shutil.copytree(kb, h2)
         ad_duzelt(h2)
-        print("[ok] beceri  -> %s (arastirma)" % h2.relative_to(proje))
+        print("[ok] beceri  -> %s (%s)" % (h2.relative_to(proje), kardes))
 
     (proje / "scripts").mkdir(exist_ok=True)
     (proje / "scripts" / "defter-yap.py").write_text(URETEC.format(repo=KAYNAK_REPO), encoding="utf-8")
