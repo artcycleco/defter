@@ -96,6 +96,8 @@ def main():
                     yeni = v
                 except OSError:
                     satirlar.append("Hesaptaki beceri %d, guncel %d; bu oturumda %s klasorunu kullan ve kullaniciya yeni zip'i yuklemesini soyle." % (yeni, v, kaynak))
+            if v <= yeni:   # kopyalandiysa ya da zaten guncelse; kopyalanamadiysa klasor ajana lazim
+                shutil.rmtree(kaynak.parents[3], ignore_errors=True)   # gecici klon kalmasin
     elif kip == "--eklenti":
         if kopya.is_dir() and kopya.resolve() != BURASI and surum(kopya / "karar-defteri.html") < yeni:
             eski = surum(kopya / "karar-defteri.html")

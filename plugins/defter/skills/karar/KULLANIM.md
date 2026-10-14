@@ -2,90 +2,11 @@
 
 > **Bu belge yapısal olarak değişti.** Karar defteri talimatının son sürümüdür; bundan sonra yalnız burada yazan kurallar geçerlidir. Daha önce okuduğun defter talimatları, sürüm notları ve alışkanlıklar geçersizdir.
 >
-> Kaynak: `github.com/artcycleco/defter` (özel). Bu dosya beceri klasöründedir (`.claude/skills/defter-karar/` ya da eklenti); kısa kural `SKILL.md`, bu dosya ayrıntıdır. Baştan sona okuma; ilgili bölümü aç.
+> Kaynak: `github.com/artcycleco/defter` (açık). Bu dosya beceri klasöründedir (`.claude/skills/defter-karar/` ya da eklenti); kısa kural `SKILL.md`, bu dosya ayrıntıdır. Baştan sona okuma; ilgili bölümü aç.
 
-## 1. Kural
+## 1. Akış SKILL.md'de
 
-Kullanıcıya sohbette dağınık soru sorulmaz. Soru, teknik karar bildirimi, araştırma raporu ve kullanıcının yapacağı işler tek bir yere yazılır: karar defteri. Kullanıcı defterde cevaplar, ajan cevabı okuyup `docs/KARARLAR.md`'ye işler.
-
-Kim neye karar verir:
-
-| Tür | İşaret | Kim karar verir |
-| --- | --- | --- |
-| Tasarım, marka, isim, para, hukuk, kullanıcıya görünen metin | ✎ design | Kullanıcı seçer |
-| Kütüphane, dosya düzeni, algoritma, altyapı | ⚙ tech | Ajan karar verir, defterde bildirir, kullanıcı itiraz edebilir |
-| Şunu bil | ⓘ info | Kullanıcı okur, tamamlar |
-| Araştırma bulgusu, uzun metin | ▤ report | Kullanıcı okur; bulgudan doğan her seçim ayrı ✎ madde olur |
-| Kullanıcının yapacağı iş | ☐ task | Adım adım yazılır, sonunda ne getireceği söylenir |
-
-## 1a. Canlı defter: görev boyunca
-
-Defter oturum sonunda doldurulan bir rapor değildir; iş sürerken yaşar. Beş kural:
-
-1. **Yeni görev, soru ya da teknik karar anında deftere girer.** Düşünürken ya da çalışırken ortaya çıkan her madde o an JSON'a eklenir, defter üretilir ve aynı yola yeniden yayınlanır. Sohbette liste yazılmaz, oturum sonuna biriktirilmez.
-2. **Hazırladığın her dosya defterde sunulur.** md, PDF, HTML, görsel ya da video ürettiysen ilgili maddeye `ekler` (ya da görsel ve video için `gorseller`) olarak koy. Kullanıcıya dosya yolu verilmez; dosyayı defterin içinde açar, okur, üzerine çizer. Ayrıntı §4.
-3. **Görünüşle ilgili soruda kanıt şarttır.** Bir şeyin nasıl göründüğünü soruyorsan, canlıysa çalışan bağlantıyı, değilse ekran görüntüsünü maddeye koy. İkisi de yoksa önce görüntüyü üret (yerel sunucu + Playwright ekran görüntüsü), sonra sor. Üreteç kanıtsız görünüş sorusuna uyarı basar.
-4. **Cevaplar görev boyunca okunur.** Her iş kaleminin sonunda, her commit'ten önce ve uzun işte en geç yarım saatte bir `defter/_ozet` okunur (§7); `son` alanı son okumadan yeniyse cevaplar tam okunur (§12). Onaylanan cevap hemen işlenir: karar kaydı, uygulama, maddenin silinmesi, yeniden yayın.
-5. **"Bitti" demeden önce defter okunur.** Görevi bitmiş saymadan önce son kez "oku" çalışır (`cevap` ve `defter` koleksiyonları, §12). Cevaplanan maddede yapılacak iş varsa ona başlanır ve döngü tekrarlanır. Cevap gelmemiş ve iş ona bağlıysa durulur: sohbette tek satır "Defterde N madde cevabını bekliyor: `<bağlantı>`", sonra beklenir. Cevaba bağlı olmayan işler sürer.
-
-## 1b. Bütçe dostu kullanım
-
-Defterin maliyeti ajanın bağlamına giren metindir. Sayfanın kendisi büyüktür ama hiç okunmaz; okunan yalnız küçük parçalardır.
-
-| İş | Pahalı yol (yapma) | Ucuz yol |
-| --- | --- | --- |
-| Madde eklemek, silmek | Kaynak JSON'u okuyup baştan yazmak | `defter-yap.py ekle` / `sil` |
-| Maddeleri görmek | JSON'u okumak | `defter-yap.py liste` (madde başına bir satır) |
-| Yeniden yayın | Maddeler sayfanın içinde; her turda sayfa değişir, yeni oturumda yayın koca bir farkla reddedilir | Sayfa sabit, maddeler `veri.json`'da; fark çıkmaz |
-| Cevap okumak | Belgeleri tek tek okumak | İki koleksiyonu `out_dir`'e listeleyip `defter-yap.py oku` |
-| Kılavuz | Bu dosyayı her seferinde baştan okumak | `SKILL.md` yeter; burada yalnız ilgili bölüm |
-| Ekran görüntüsü | Çektiği görüntüyü açıp bakmak | Maddeye koymak; yalnız doğrulamak gerekirse bakmak |
-| Yayın sıklığı | Her madde için ayrı yayın | Bir iş adımının maddelerini tek yayında toplamak |
-
-#### Şablonu geliştirirken (planlama oturumu)
-
-- **Ortak kabuk:** Merkez ve defter ayrı yapılardır ama aynı kabuğu kullanır (renkler, üst çubuk, menü, ayarlar, kart, ara ve git, odak). Kabuk yalnız şablonda yazılır; `merkez/merkez-yap.py` şablonun stilini ve simgelerini Merkez'e koyar. Kabukta bir şey değişince Merkez yeniden üretilir ve yayınlanır; ortak bir özellik (ör. odak modu, kaydırma) ikisine de eklenir, Merkez'e özgü kurallar `merkez-kalip.html`'de kalır.
-
-Her yeni özellikte bütçe ölçülür ve rapora yazılır: ajanın okuduğu yüzeyler (`SKILL.md` boyutu, `cevap` kaydının boyutu, üretecin çıktısı), sayfanın boyutu ve yeniden yayın farkı. Ajanın okuduğu bir şey büyüyorsa küçültmeden yayınlanmaz. Sayfada kalan özellik (görünüm, tuş, düğme) ajana maliyet getirmez.
-
-Şablon sürümü değiştiğinde sayfa bir kez değişir; o turdaki yayın farkı büyük olabilir. Bu yüzden şablonu yalnız kullanıcının isteğiyle planlama oturumu yükseltir, öteki ajanlar "yükselt" denince yapar.
-
-## 2. Dosyalar
-
-| Dosya | Ne işe yarar | Ajan ne yapar |
-| --- | --- | --- |
-| `docs/defterler/veri/<ad>.json` | Defterin kaynağı; maddeler burada yaşar | `ekle`, `sil` ile değiştirir, commit eder |
-| `<beceri>/defter-yap.py` (projede `scripts/defter-yap.py` yönlendirmesi) | Kaynağı denetler, sayfayı ve veri dosyasını üretir | Çalıştırır |
-| `docs/defterler/<ad>.html` ve `<ad>.veri.json` | Üretilen sayfa ve maddeler; yayınlanan şey | Elle düzenlemez, okumaz |
-| `<beceri>/karar-defteri.html` | Şablon: görünüm, kayıt, klavye, tema | **Açmaz, kopyalamaz, değiştirmez** |
-| `<beceri>/YAZIM-KURALI.md` | Kullanıcıya yazılan her metnin biçim kuralı | Madde yazmadan önce okur |
-| `docs/KARARLAR.md` | Verilen kararların tek sayfalık kaydı | Cevap geldikçe işler |
-
-## 3. Yeni defter açmak
-
-```bash
-# 1. kaynağı yaz
-docs/defterler/veri/site-gizlilik.json
-
-# 2. sayfayı üret: site-gizlilik.html (sabit sayfa) + site-gizlilik.veri.json (maddeler)
-python3 scripts/defter-yap.py docs/defterler/veri/site-gizlilik.json docs/defterler/site-gizlilik.html
-
-# 3. artifact olarak yayınla: file_path site-gizlilik.html, capabilities {"db": {}, "assets": {}}
-#    files: üretecin bastığı "Artifact files" haritası aynen (veri.json her zaman içindedir)
-
-# sonraki turlar
-python3 scripts/defter-yap.py ekle docs/defterler/veri/site-gizlilik.json yeni-madde.json
-python3 scripts/defter-yap.py sil  docs/defterler/veri/site-gizlilik.json G3
-python3 scripts/defter-yap.py liste docs/defterler/veri/site-gizlilik.json
-```
-
-Yerelde tarayıcıda açıp bakmak için `--tek` ile tek dosya üretilir; yayında kullanılmaz.
-
-Üreteç JSON'u denetler: uzun tire varsa durur, yazım kuralına aykırı madde için uyarı basar. Ek ve görsel dosyalarını da denetler: dosya yoksa, yol göreli değilse ya da dosya 15 MB'tan büyükse defteri üretmez. Sonunda yayında `files` olarak verilecek haritayı basar; elle yazma, onu kopyala. Uyarıları düzelt, sonra yayınla.
-
-Yayından sonra sohbette tek satır: "Defter hazır: `<bağlantı>`, N acil madde." Bağlantıyı `docs/DURUM.md`'ye kendi başlığının altına yaz.
-
-Var olan deftere madde eklemek de aynı yoldur: JSON'a ekle, üret, **aynı dosya yoluna** yeniden yayınla. Bağlantı ve cevaplar korunur.
+Ajanın bütün akışı (defter açmak, yayın, okuma, kapatma, Merkez satırı, bütçe) `SKILL.md`'dedir ve kendi başına yeter. Bu dosya başvurudur: JSON alanlarının tamamı (§4), sayfada kullanıcının yapabildikleri (§8), yasaklar (§9) ve sürüm notları (§13 ve sonrası). Normal işte açılmaz; yalnız gereken bölüm okunur.
 
 ## 4. JSON alanları
 
@@ -168,36 +89,9 @@ Kullanıcının bir yere yapıştıracağı her şey (komut, kod, bir ajana ya d
 
 Biçim kuralı `YAZIM-KURALI.md`'de: bir paragraf bir fikir, liste paragrafa gömülmez, kalın yalnız terim için, karşılaştırma tabloya girer, her iki üç paragrafta bir ara başlık. Uzun tire hiçbir yerde kullanılmaz.
 
-## 7. Cevapları okumak ve işlemek
+## 7. Cevapları okumak
 
-Ne zaman: görev boyunca düzenli olarak ve görevi bitirmeden önce mutlaka (§1a, kural 4 ve 5).
-
-Üç adımda, her adım bir öncekinden ucuz olduğu için sırayla:
-
-1. **Özet.** `read_db` get `defter/_ozet` → `{acik, bitti, senden, taslak, son}`. `son` son okumandan eski değilse tam oku; sayılar sıfır diye durma (şablon 48 ve öncesi tamamlanmamış notu saymaz).
-2. **Cevaplar.** `read_db` list collection `cevap`. Her belge incedir, yalnız tamamlanmış maddeler:
-
-```json
-{"id": "G1", "q": "Sorunun başlığı", "choice": "a", "label": "Seçenek A",
- "note": "kullanıcının maddeye notu", "steps": [true, false], "gorsel": 1,
- "notlar": [{"ad": "Ana sayfa taslağı", "tur": "resim", "not": "başlık çok büyük"}], "doneAt": "..."}
-```
-
-`note` maddenin notudur. `notlar` kullanıcının tam ekranda tek tek dosyalara (ek, görsel, video, PDF, bağlantı) yazdığı notlardır; `ad` hangi dosya olduğunu söyler. Her birini o dosyaya dair geri bildirim olarak işle.
-
-3. **Kullanıcının eklediği maddeler.** `senden` sıfır değilse collection `defter` içinde `UG-` ile başlayan belgeler (`title`, `body`).
-
-`gorsel` yalnız sayıdır: Kullanıcı o maddeye görsel, video ya da PDF eklemiş, belki üzerine çizmiştir. Ajan görselin kendisini açamaz; içeriği gerekiyorsa sohbete yapıştırmasını ister. `defter` koleksiyonunun geri kalanı sayfanın kendi durumudur (sıra, küçültme, çizgiler); ajan okumaz.
-
-Her cevap için sırasıyla:
-
-1. `docs/KARARLAR.md`'ye `tarih | karar | kaynak (defter id)` satırı ekle.
-2. Kararı uygula.
-3. Maddeyi JSON kaynağından sil; `write_db` batch ile `cevap/<id>` belgelerini sil.
-4. Defteri yeniden üret ve yayınla.
-5. Sohbette tek satır: "N cevap işlendi: ...".
-
-Silinen madde id'si bir daha kullanılmaz. Fikir değişirse yeni madde açılır.
+`SKILL.md` "oku" bölümü. Kısaca: `cevap` ve `defter` koleksiyonları `out_dir`'e, `defter-yap.py oku`, her cevabı `kapat` ile kapat.
 
 ## 8. Kullanıcı sayfada ne yapabiliyor
 
@@ -230,62 +124,11 @@ Ajanın bilmesi yeter, kod yazması gerekmez:
 - Kişisel veri yazmak. Defterler proje kararları içindir.
 - Görünüm, tema ya da kayıt kodunu değiştirmek. Şablon yalnız kullanıcının isteğiyle, planlama oturumunda değişir.
 
-## 10. Her projede ve her bilgisayarda kullanım
+## 10. Kurulum, güncelleme, Merkez
 
-Defter kendi reposundadır: `github.com/artcycleco/defter`. Repo bir Claude Code eklenti pazarıdır.
+Kurulum yolları reponun `KURULUM.md` dosyasındadır (claude.ai ve Claude Code için eklenti, bulut oturumu için projeye kopya). Güncelleme: eklentide `claude plugin update`; projeye kopyada kanca kendisi yeniler.
 
-| Nerede | Nasıl gelir |
-| --- | --- |
-| Bilgisayarındaki Claude Code (terminal, masaüstü) | Eklenti: `claude plugin marketplace add artcycleco/defter`, sonra `claude plugin install defter@artcycle --scope user`. Çağırma `/defter-karar` ya da `/defter:karar` |
-| Bulut oturumu (claude.ai/code) | Bulut eklenti kurmaz; projede `.claude/skills/defter-karar/` kopyası olmalı (`kur/projeye-kur.py`) |
-| Claude uygulaması sohbeti, Cowork | claude.ai'da Beceriler (Skills) bölümüne `defter` klasörünün zip'i yüklenir |
-
-## 11. "defteri güncelle"
-
-Kullanıcı bir ajana "defteri güncelle" dediğinde:
-
-1. Kaynak repoyu al: `git clone --depth 1 https://github.com/artcycleco/defter /tmp/defter` (varsa `git -C /tmp/defter pull`). Bulutta erişim yoksa repoyu oturuma ekle.
-2. Projenin kökünde çalıştır: `python3 /tmp/defter/kur/projeye-kur.py .` Beceri `.claude/skills/defter-karar/` altına kopyalanır, `scripts/defter-yap.py` yönlendirmesi yazılır, eski talimat dosyalarının yerine yönlendirme konur.
-3. Yeni `SKILL.md`'yi oku; eski alışkanlıkları bırak.
-4. Canlı defterleri "yükselt": kaynak JSON aynı, yeni şablonla üret, aynı bağlantıya yayınla.
-5. Commit et; sohbette tek satır "Defter güncellendi: sürüm N".
-
-## 12. Defter Merkezi
-
-Bütün defterlerin tek sayfası: https://github.com/artcycleco/defter#merkez . Kullanıcı bütün defterlerin açık sorularını burada görür ve buradan cevaplar (öneriyi onayla, şık seç, not yaz, Hayır ve nedeni, görevde Yaptım). Defterler, Kararlar (bütün defterlerde arama) ve Arşiv sekmeleri de burada.
-
-Merkez kimsenin defterini okuyamaz: her artifact'ın veritabanı ayrıdır, bir sayfa ötekinin cevabını göremez. Soruları ve son kararları Merkez'e ajan taşır; Merkez'de verilen cevabı da deftere ajan taşır. İkisini `defter-yap.py oku` hazırlar:
-
-```
-# 1) defterin cevapları ve Merkez'de bu deftere verilen cevaplar
-ArtifactData list   url <defter url>  collection cevap  out_dir .merkez/ham/<ad>
-ArtifactData query  url https://github.com/artcycleco/defter#merkez  collection cevap
-                    query {"where": [["defter","==","<defter doc_id>"]]}  out_dir .merkez/ham/<ad>-merkez
-# 2) oku: değişen cevaplar, Merkez'den gelenler, Merkez satırı
-python3 defter-yap.py oku docs/defterler/veri/<ad>.json --url <defter url> \
-  --cevap .merkez/ham/<ad> --merkez .merkez/ham/<ad>-merkez --durum "Paket 1 kuruluyor" --proje "artcycle.co · Site"
-# 3) çıktının söylediği iki yazma
-ArtifactData batch  url <defter url>  writes [{op: set, collection: cevap, doc_id: <id>, file_path: .../aktar/<id>.json}, ...]
-ArtifactData update url <Merkez url>  collection defterler  doc_id <defter doc_id>  file_path .../satir.json  if_version <satırın sürümü>
-```
-
-- Merkez satırı: `{ad, url, proje, surum, acik, acil, son, durum, maddeler, kararlar}`. `maddeler` açık soruların kısa hâli (başlık, öneri, şıklar, maliyet rozeti, bekleme); `kararlar` son 30 karar.
-- Merkez cevabı `cevap/<defter doc_id>__<madde id>`: `{defter, id, q, choice, label, note, sinif, ret, at}`. Deftere `kaynak: "merkez"` ile geçer; sayfa onu Bitti'ye alır, "Merkez'den" rozeti çıkar.
-- Merkez'de cevap, ajan bir sonraki okumaya kadar "gönderildi" görünür (kullanıcı geri alabilir); ajan okuyunca "işlendi" olur. Defterde cevaplanan soru Merkez'den ajan okuyunca düşer.
-- `.merkez/` klasörü (ham cevaplar, okunan özeti, bekleyenler) git'e girmez.
-- Bedeli: okuma başına birkaç yüz token (yalnız işlenmemiş cevap tam basılır; kapatılan bir daha basılmaz), satır yazma 300 ile 600 token.
-
-#### Eşitle (Drive köprüsü, sürüm 47)
-
-Merkez'in üst çubuğundaki iki oklu düğme ve defter menüsündeki "Merkez'le eşitle" ajansız çalışır, token harcamaz:
-
-- Defter, cevap değiştikçe (4 saniye sonra) ve açılışta kullanıcının Drive'ındaki **Defter Esitleme** klasörüne `kd-<defter id>.json` bırakır: açık sorular ve verilen cevaplar. Eski dosya çöpe gider.
-- Merkez Eşitle'de (izin verildiyse açılışta da) bu dosyaları okur: cevaplanan sorular düşer, yeni sorular gelir, Merkez'de satırı olmayan defter kendiliğinden katılır. Değişmeyen dosya indirilmez.
-- Merkez'de verilen cevaplar `kd-merkez-cevap.json`'a yazılır; defter açılınca ya da eşitlenince onları alır, Bitti'ye "Merkez'den" rozetiyle geçirir ve ajanın okuduğu `cevap` belgesine yazar.
-- Gerekenler: Google Drive bağlayıcısı (claude.ai Ayarlar → Bağlayıcılar), sayfanın `mcp` yeteneği (SKILL'deki yayın satırı) ve kaynakta `url`. Her sayfa ilk kullanımda Drive iznini bir kez sorar.
-- Ajanın `oku` turu yine çalışır ve aynı satırı yazar; köprü onu gereksiz kılmaz, yalnız kullanıcının beklemesini kaldırır.
-
-Şablon sürümü değişince planlama oturumu `meta/surum` belgesine `{son: N}` yazar; Merkez eski sürümleri buna göre işaretler. `meta/ayar` belgesinde `takvim`: Kullanıcının Terminler takviminin kimliği.
+Defter Merkezi bütün defterlerin açık sorularını ve kararlarını tek sayfada toplar. Bağlantısı `docs/defterler/ayar.json` içindeki `merkez` alanıdır. Merkez kendi başına hiçbir defteri okuyamaz (her artifact'ın veritabanı ayrı); satırını ajan yazar (`oku` hazırlar), cevaplar Drive köprüsüyle ya da ajanın okumasıyla deftere geçer.
 
 ## 13. Sürüm 38 ile gelenler
 
@@ -392,7 +235,7 @@ Defter Merkezi bağlantısı şablonda sabittir; başka bir Merkez için kaynak 
 
 | Ne | Nasıl |
 | --- | --- |
-| Drive köprüsü | Defter ve Merkez, kullanıcının Drive'ındaki Defter Esitleme klasörü üzerinden ajansız eşitlenir (§12 Eşitle) |
+| Drive köprüsü | Defter ve Merkez, kullanıcının Drive'ındaki Defter Esitleme klasörü üzerinden ajansız eşitlenir (§10) |
 | Merkez'le eşitle | Defter menüsünün altında; elle eşitleme |
 | Eşitle düğmesi | Merkez'in üst çubuğunda; son eşitleme zamanı düğmenin üzerinde |
 | Yayın | `capabilities`'e `mcp` (Google Drive, dört araç) eklenir; kaynakta `url` şart |
@@ -443,4 +286,17 @@ Kullanıcının isteği (Araştırma Atölyesi): sekmeler sığmıyor, kontrol e
 | `"m"` | Açmanın maliyeti; yüksekse ajan açmadan önce tek ✎ maddeyle sorar |
 
 Ajan kapalı sayfayı güncellemez. Koşul gelince (o derse dair iş başlayınca gibi) `durum`u siler, sayfa sekmeye çıkar. Başta onaylanan sayfalar sormadan açılır; ajan aynı tür için tekrar sormaz. Sekme çubuğu taşınca yana kayar.
+
+## 26. Sürüm 51 ile gelenler: ince sayfa
+
+Ölçüm (Atölye, 4 madde): sayfa 235 KB'tan 9,6 KB'a indi. Yeni bir oturumda platform yayından önce canlı sayfayı ajana geri verir; bu bedel yaklaşık 60 bin tokendan 2 ile 3 bine düştü.
+
+| Ne | Nasıl |
+| --- | --- |
+| Sayfa | Başlık, maddeler (sıkıştırılmış JSON) ve iki bağlantı |
+| Stil ve kod | `defter-<özet>.css`, `defter-<özet>.js`; ad içeriğin özeti, kod değişmedikçe aynı ad, yeniden gönderilmez |
+| `veri.json` | Kalktı; maddeler sayfada (unutulacak ikinci dosya yok) |
+| Ret | Yeni oturumda değişmemiş bir dosya "okumadın" diye reddedilirse haritadan çıkarılır |
+
+`oku` artık seçimi önerinle karşılaştırır ("= onerin" ya da "onerin degil; onerin: X"); ajan maddeyi açmadan kararı anlar. `defter` koleksiyonu için bir sonraki okumada yalnız değişenleri getiren sorguyu basar.
 

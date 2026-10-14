@@ -2,7 +2,7 @@
 name: arastirma
 description: Araştırma Defteri; kullanıcının tezi, ders metinleri ve akademik kaynak araştırması için silinmez defter. "araştırma defteri", "tez defteri", "kaynak tara", "literatür taraması", "kaynakça", "Claude Science'tan gelen adaylar" dendiğinde ya da akademik bir kaynağı kullanıcıya onaylatman gerektiğinde kullan. Defter sayfası ve üreteç `karar` becerisi (projede `defter-karar`)nden gelir; bu beceri araştırmanın sırasını ve kurallarını verir.
 ---
-> Kaynak: `github.com/artcycleco/defter` (özel repo), `plugins/defter/skills/arastirma/`. Burada düzenleme yapma.
+> Kaynak: `github.com/artcycleco/defter` (açık repo), `plugins/defter/skills/arastirma/`. Burada düzenleme yapma.
 
 Bu klasördeki dosyalar:
 

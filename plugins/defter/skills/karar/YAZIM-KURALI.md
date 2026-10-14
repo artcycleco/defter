@@ -1,6 +1,6 @@
 # Yazım kuralı; kullanıcıya yazılan her metin
 
-Geçerli olduğu yerler: karar defteri maddeleri (`why`, `body`), sohbet mesajları, `docs/` altındaki raporlar, panel ve site dışı iç yazışma. Site metinleri ayrı (`docs/karnaval/ESER-METNI-REHBERI.md`).
+Geçerli olduğu yerler: karar defteri maddeleri (`why`, `body`), sohbet mesajları, `docs/` altındaki raporlar, panel ve site dışı iç yazışma. Sitede ve üründe kullanıcıya görünen metin için projenin kendi metin rehberi varsa o geçerlidir.
 
 ## On bir kural
 
@@ -48,4 +48,4 @@ Bu biçimler `why`, `body`, `rec`, `deliver`, seçenek açıklaması ve görev a
 | `\| a \| b \|` satırları | tablo; ikinci satır `\| --- \| --- \|` ise ilk satır başlık olur |
 | `---` | ince yatay çizgi |
 
-`scripts/defter-yap.py` defteri üretirken bu kuralları denetler: uzun paragraf, satır içi ` - ` ayırıcı, uzun kalın parça ve fazla kalın için uyarı basar.
+Üreteç (`defter-yap.py`) defteri üretirken bu kuralları denetler: uzun paragraf, satır içi ` - ` ayırıcı, uzun kalın parça ve fazla kalın için uyarı basar.
