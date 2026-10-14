@@ -100,6 +100,7 @@ Sayfa ince: maddeler sayfanın içinde; stil ve kod `defter-<özet>.css` ve `def
 - Kişisel bilgi (adres, telefon, kimlik, sağlık, aile, hesap) deftere ya da rapora girecekse önce ✎ onay maddesi aç.
 
 #### Biçim
+Komut ve yol için özel alan yok; sayfa kendisi tanır. Komutu kod bloğuna ya da `` `git pull` `` gibi satır içine yaz: çerçeveli, renkli, "Kopyala" düğmeli kutu olur. Yolu `` `docs/defterler/` `` gibi yaz (proje köküne göre ya da `C:\...`): tıklanınca kopyala, GitHub'da aç, Gezgin'de aç menüsü çıkar.
 Boş satır paragraf, `**kalın**`, `- ` ve `1. ` liste, `> ` alıntı, `#### ` ara başlık, `| a | b |` tablo, kod bloğu. Uzun tire yok. Kullanıcının kopyalayacağı komut `` `komut` `` ya da kod bloğunda; birine gönderilecek mesaj ```` ```mesaj Site ajanına ```` bloğunda. Kural: `${CLAUDE_SKILL_DIR}/YAZIM-KURALI.md`.
 
 ## "oku": cevapları işle

@@ -448,6 +448,30 @@ def _ayar(veri_yolu):
     return {}
 
 
+def _depo(veri_yolu):
+    """ayar.json'daki repo ya da git uzak adresinden (owner/repo, varsayilan dal)."""
+    import subprocess
+    ay = _ayar(veri_yolu)
+    if ay.get("repo"):
+        return ay["repo"], ay.get("dal") or "main"
+    kok = pathlib.Path(veri_yolu).resolve().parent
+    try:
+        u = subprocess.run(["git", "-C", str(kok), "config", "--get", "remote.origin.url"], capture_output=True, text=True, timeout=5).stdout.strip()
+    except Exception:
+        return None
+    m = re.search(r"[:/]([\w.-]+)/([\w.-]+?)(?:\.git)?/?$", u)
+    if not m:
+        return None
+    dal = "main"
+    try:
+        s = subprocess.run(["git", "-C", str(kok), "symbolic-ref", "--short", "refs/remotes/origin/HEAD"], capture_output=True, text=True, timeout=5).stdout.strip()
+        if s.startswith("origin/"):
+            dal = s.split("/", 1)[1]
+    except Exception:
+        pass
+    return "%s/%s" % (m.group(1), m.group(2)), dal
+
+
 def _gitignore():
     """.merkez/ (okuma onbellegi) git'e girmesin: proje kokunde .gitignore'a eklenir."""
     kok = pathlib.Path.cwd()
@@ -482,6 +506,11 @@ def uret(veri_yolu, cikti_yolu, sablon=SABLON, tek=False):
                 if m:
                     veri = dict(veri, merkez=m)
                 break
+    # sablon 52: metindeki yollar GitHub'a baglanir; depo ve varsayilan dal kendiliginden bulunur (ajan yazmaz)
+    if not veri.get("repo"):
+        dep = _depo(veri_yolu)
+        if dep:
+            veri = dict(veri, repo=dep[0], dal=dep[1])
     hata, yapi_uyari = yapisal(veri)
     kapanis_denetle(veri, veri_yolu, hata, yapi_uyari)
     if not veri.get("url") and pathlib.Path(cikti_yolu).exists():

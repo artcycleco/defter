@@ -300,3 +300,13 @@ Ajan kapalı sayfayı güncellemez. Koşul gelince (o derse dair iş başlayınc
 
 `oku` artık seçimi önerinle karşılaştırır ("= onerin" ya da "onerin degil; onerin: X"); ajan maddeyi açmadan kararı anlar. `defter` koleksiyonu için bir sonraki okumada yalnız değişenleri getiren sorguyu basar.
 
+## 27. Sürüm 52 ile gelenler: komut kutusu ve tıklanır yol
+
+| Ne | Nasıl | Ajana maliyeti |
+| --- | --- | --- |
+| Komut kutusu | Kod bloğu çerçeveli, ayrı renkte, üstte "Komut" etiketi ve yazılı "Kopyala" düğmesi; satır içi komut (`git ...`, `python3 ...`, `claude ...`) tıklanınca kopyalanır | Yok; sayfa tanır |
+| Tıklanır yol | Metindeki klasör ve dosya yolu çip olur: Yolu kopyala, GitHub'da aç (depo ve dal üreteçten), Gezgin'de aç | Yok; depo `git` uzak adresinden ya da `ayar.json` `repo` alanından |
+| Gezgin köprüsü | Windows'ta bir kez `kur/windows-gezgin.ps1`; `defter-ac:` bağlantısını yalnız klasör açmak için tanır, dosya çalıştırmaz. Proje klasörü defterin Ayarlar > Bilgisayar alanına bir kez yazılır | Yok |
+
+Sunucu yolu (`/home/user/<repo>/...`) proje köküne göre çevrilir; projede olmayan sunucu yolu (`/tmp/...`) Gezgin'de açılmaz, kopyalanır.
+

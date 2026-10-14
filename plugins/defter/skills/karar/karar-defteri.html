@@ -1,11 +1,11 @@
 <title>Karar Defteri Şablonu</title>
-<!-- karar-defteri şablon sürümü: 51 (2026-10-14): sayfa ince yayınlanır (maddeler sayfada; stil ve kod içerik özetli ayrı dosyada, değişmedikçe yeniden gönderilmez); veri.json kalktı; yeni oturumda yayından önceki okuma bedeli ~60k tokendan maddelerin boyuna iner. 50 (2026-10-14): okuma sayfalarında durum: kapalı sayfa sekme çubuğunda durmaz, "Diğer" altında koşulu ve maliyetiyle listelenir, istenince gösterilir; sekme çubuğu taşınca yana kayar. 49 (2026-10-12): maddeler sayfaya da gömülür, veri.json yayına gitmese ya da eski kalsa da sayfa doğru maddeleri gösterir; tamamlanmamış maddeye yazılan not ve seçim de ajana gider (taslak); Ajana haber ver mesajı tamamlanmamış notları da sayar. 48 (2026-10-12): dar ekranda adım, dosya ve düz satırdaki uzun bağlantı ve yol alt satıra kırılır, sayfa yana taşmaz; beceride iletişim kuralı (Yaptım, Senin işin, Soru). 47 (2026-10-12): Drive köprüsü: defter cevaplarını ve açık sorularını kullanıcının Drive'ındaki "Defter Esitleme" klasörüne bırakır, Merkez'in gönderdiği cevapları oradan alır (yapay zekâ çalışmaz); menüde "Merkez'le eşitle". 46 (2026-10-12): acil ve riskli maddede şık seçmeden tamamlanmaz; toplu cevap ve kaydırma riskli maddeyi atlar; yedeği indir (JSON ve md); kaynakçada güven sınıfı, DOI doğrulandı, geri çekildi rozetleri, BibTeX ve RIS indir; kaydırma tablo, kod ve rapor metninde çalışmaz; Hayır nedenlerinde "Başka öner"; uzun önerim katlanır; ⋯ menüsü klavyeyle gezilir; her yerde odak çerçevesi. 45 (2026-10-12): Merkez'den gelen cevap deftere işlenir; açık maddenin sorusu da ajana gider; #id ile maddeye git; odak modu; komut paleti (Ctrl+K); çevrimdışı kuyruk; karar kartı, taslak 24 saat, kesinleştir, gerekçe, yerine geçti zinciri, kim karar verir (daci), geri dönülmez rozeti; bekleme süresi; gereksiz soru; sessiz saatler; boy bekçisi; bütçe satırı; haftalık karar özeti; toplu cevap; kaydırarak cevap; yazdırma; sade kart (Tamamla öneriyle tamamlar, ⋯ menüsü, 📎 not kutusunda). 44 (2026-10-11): okuma sayfaları (sayfalar), aranır ve süzülür kaynakça (kaynakca), metinde görsel, teyit adımı (onay). 43: hızlı cevap (Tamam, Hayır ve nedeni, Soru sor); kartta soru ve ajanın cevabı (yanitlar); yeni ve değişti rozeti (degisti); risk rozeti; not sınıflama (sinif); Bitti de arama; sekmede acil sayısı; okundu; Dinle; veritabanı yoksa Claude a gönder; proje rengi. 42: başlıkta LABS diyafram logosu ve tam ad; menüde çizgi ikonlar, acil varsa turuncu bildirim noktası; şıkta maliyet rozeti (m); metindeki çıplak adresler tıklanır. 41: yeni üst şerit (ayarlar çarkı, tam ekran menü, ince ilerleme çizgisi), durum kısa bildirim; açıklama satırları kılavuza; karşılaştırma ölçüler aynıysa sürgü, değilse yan yana ve tam ekran; yakınlaştırma hafızası. 40: şıkların yanında açıkla düğmesi (d alanı seçmeden okunur); terimler alanı, kelimeye dokununca tanımı açılır. 39: önce/sonra sürgüsü kırpmaz, akıcı, oranlar çok farklıysa yan yana; mikrofon kapalıysa düğmenin yanında sistem diktesi ipucu. 38: Ajana haber ver düğmesi (yorumla oturumu uyandırır); çoklu seçim; görsele numaralı iğne ve not; önce/sonra sürgüsü; termin için takvime ekle; dikte düğmesi; indirilebilir dosya eki (zip). Kaynak: github.com/artcycleco/defter. -->
+<!-- karar-defteri şablon sürümü: 52 (2026-10-14): komut kutusu çerçeveli ve ayrı renkte, "Kopyala" düğmeli; satır içi komut da kopyalanır; metindeki klasör ve dosya yolu tıklanır (kopyala, GitHub'da aç, bilgisayarda Gezgin'de aç; bilgisayar klasörü ayarlardan, Gezgin köprüsü bir kez kurulur). 51 (2026-10-14): sayfa ince yayınlanır (maddeler sayfada; stil ve kod içerik özetli ayrı dosyada, değişmedikçe yeniden gönderilmez); veri.json kalktı; yeni oturumda yayından önceki okuma bedeli ~60k tokendan maddelerin boyuna iner. 50 (2026-10-14): okuma sayfalarında durum: kapalı sayfa sekme çubuğunda durmaz, "Diğer" altında koşulu ve maliyetiyle listelenir, istenince gösterilir; sekme çubuğu taşınca yana kayar. 49 (2026-10-12): maddeler sayfaya da gömülür, veri.json yayına gitmese ya da eski kalsa da sayfa doğru maddeleri gösterir; tamamlanmamış maddeye yazılan not ve seçim de ajana gider (taslak); Ajana haber ver mesajı tamamlanmamış notları da sayar. 48 (2026-10-12): dar ekranda adım, dosya ve düz satırdaki uzun bağlantı ve yol alt satıra kırılır, sayfa yana taşmaz; beceride iletişim kuralı (Yaptım, Senin işin, Soru). 47 (2026-10-12): Drive köprüsü: defter cevaplarını ve açık sorularını kullanıcının Drive'ındaki "Defter Esitleme" klasörüne bırakır, Merkez'in gönderdiği cevapları oradan alır (yapay zekâ çalışmaz); menüde "Merkez'le eşitle". 46 (2026-10-12): acil ve riskli maddede şık seçmeden tamamlanmaz; toplu cevap ve kaydırma riskli maddeyi atlar; yedeği indir (JSON ve md); kaynakçada güven sınıfı, DOI doğrulandı, geri çekildi rozetleri, BibTeX ve RIS indir; kaydırma tablo, kod ve rapor metninde çalışmaz; Hayır nedenlerinde "Başka öner"; uzun önerim katlanır; ⋯ menüsü klavyeyle gezilir; her yerde odak çerçevesi. 45 (2026-10-12): Merkez'den gelen cevap deftere işlenir; açık maddenin sorusu da ajana gider; #id ile maddeye git; odak modu; komut paleti (Ctrl+K); çevrimdışı kuyruk; karar kartı, taslak 24 saat, kesinleştir, gerekçe, yerine geçti zinciri, kim karar verir (daci), geri dönülmez rozeti; bekleme süresi; gereksiz soru; sessiz saatler; boy bekçisi; bütçe satırı; haftalık karar özeti; toplu cevap; kaydırarak cevap; yazdırma; sade kart (Tamamla öneriyle tamamlar, ⋯ menüsü, 📎 not kutusunda). 44 (2026-10-11): okuma sayfaları (sayfalar), aranır ve süzülür kaynakça (kaynakca), metinde görsel, teyit adımı (onay). 43: hızlı cevap (Tamam, Hayır ve nedeni, Soru sor); kartta soru ve ajanın cevabı (yanitlar); yeni ve değişti rozeti (degisti); risk rozeti; not sınıflama (sinif); Bitti de arama; sekmede acil sayısı; okundu; Dinle; veritabanı yoksa Claude a gönder; proje rengi. 42: başlıkta LABS diyafram logosu ve tam ad; menüde çizgi ikonlar, acil varsa turuncu bildirim noktası; şıkta maliyet rozeti (m); metindeki çıplak adresler tıklanır. 41: yeni üst şerit (ayarlar çarkı, tam ekran menü, ince ilerleme çizgisi), durum kısa bildirim; açıklama satırları kılavuza; karşılaştırma ölçüler aynıysa sürgü, değilse yan yana ve tam ekran; yakınlaştırma hafızası. 40: şıkların yanında açıkla düğmesi (d alanı seçmeden okunur); terimler alanı, kelimeye dokununca tanımı açılır. 39: önce/sonra sürgüsü kırpmaz, akıcı, oranlar çok farklıysa yan yana; mikrofon kapalıysa düğmenin yanında sistem diktesi ipucu. 38: Ajana haber ver düğmesi (yorumla oturumu uyandırır); çoklu seçim; görsele numaralı iğne ve not; önce/sonra sürgüsü; termin için takvime ekle; dikte düğmesi; indirilebilir dosya eki (zip). Kaynak: github.com/artcycleco/defter. -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Manrope:wght@400;500;600;700&display=swap">
 <style>
 /* ─── İki kabuk: Atölye (gündüz) · Kulis (gece). Sağ üstteki güneş/ay anahtarı. Ajan bu dosyada yalnız JSON bloğunu doldurur. ─── */
-body[data-skin="kulis"]{--bg:#15090E;--bg-2:#1F1218;--card:#1B0F14;--ink:#EDE7DA;--ink-2:#B8B0A0;--ink-3:#8C8577;--line:#3A2A30;--line-2:#54404A;--accent:#C5A059;--accent-ink:#D6B577;--accent-soft:#2A1C22;--ok:#9CC292;--ok-soft:#22301F;--urgent:#E0764F;--urgent-soft:#3A1E17;--thumb:#54404A;--on-accent:#15090E;--going:#C1512F;--going-ink:#F08A5E;--going-soft:#3A1E17}
-body[data-skin="atolye"]{--bg:#F3F3F1;--bg-2:#E9E9E5;--card:#FFFFFF;--ink:#1C1C1C;--ink-2:#55554F;--ink-3:#6E6E67;--line:#D6D6D0;--line-2:#BDBDB6;--accent:#C1512F;--accent-ink:#9A3E22;--accent-soft:#F6E3DC;--ok:#2F6547;--ok-soft:#DFEFE6;--urgent:#B4261A;--urgent-soft:#F7DAD6;--thumb:#C9C9C2;--on-accent:#FFFFFF;--going:#B8860B;--going-ink:#6B4E00;--going-soft:#FFF0B8}
+body[data-skin="kulis"]{--kod-bg:#0F1E22;--kod-ink:#D9ECE6;--kod-bas:#7FD1B9;--kod-cizgi:#24434A;--bg:#15090E;--bg-2:#1F1218;--card:#1B0F14;--ink:#EDE7DA;--ink-2:#B8B0A0;--ink-3:#8C8577;--line:#3A2A30;--line-2:#54404A;--accent:#C5A059;--accent-ink:#D6B577;--accent-soft:#2A1C22;--ok:#9CC292;--ok-soft:#22301F;--urgent:#E0764F;--urgent-soft:#3A1E17;--thumb:#54404A;--on-accent:#15090E;--going:#C1512F;--going-ink:#F08A5E;--going-soft:#3A1E17}
+body[data-skin="atolye"]{--kod-bg:#1E2A33;--kod-ink:#E8F1F2;--kod-bas:#86D7C1;--kod-cizgi:#2F4250;--bg:#F3F3F1;--bg-2:#E9E9E5;--card:#FFFFFF;--ink:#1C1C1C;--ink-2:#55554F;--ink-3:#6E6E67;--line:#D6D6D0;--line-2:#BDBDB6;--accent:#C1512F;--accent-ink:#9A3E22;--accent-soft:#F6E3DC;--ok:#2F6547;--ok-soft:#DFEFE6;--urgent:#B4261A;--urgent-soft:#F7DAD6;--thumb:#C9C9C2;--on-accent:#FFFFFF;--going:#B8860B;--going-ink:#6B4E00;--going-soft:#FFF0B8}
 :root{--serif:"Newsreader",Georgia,serif;--sans:"Manrope","Segoe UI",system-ui,sans-serif}
 *{box-sizing:border-box;scrollbar-color:var(--thumb) transparent;scrollbar-width:thin}
 *::-webkit-scrollbar{width:8px;height:8px}*::-webkit-scrollbar-track{background:transparent}*::-webkit-scrollbar-thumb{background:var(--thumb);border-radius:4px}
@@ -157,6 +157,27 @@ textarea::placeholder,input::placeholder{color:var(--ink-3);opacity:1}
 .kod-sar{position:relative}.kod-sar .kopyala{position:absolute;top:7px;right:7px;width:30px;height:30px;margin:0}.kod-sar pre.kod{padding-right:46px}
 @media (pointer:coarse){.kopyala{width:34px;height:34px;vertical-align:-11px}.kod-sar .kopyala{width:38px;height:38px}}
 .body pre.kod{background:var(--bg-2);border:1px solid var(--line);border-radius:6px;padding:10px 12px;overflow:auto;font:12.5px/1.5 ui-monospace,Menlo,Consolas,monospace;white-space:pre;margin:10px 0}
+/* 52: komut kutusu: çerçeveli, ayrı renk, üstte etiket ve yazılı Kopyala */
+.komut-kutu{margin:12px 0;border:1px solid var(--kod-cizgi);border-radius:10px;background:var(--kod-bg);color:var(--kod-ink);overflow:hidden;box-shadow:0 1px 0 rgba(0,0,0,.08)}
+.komut-bas{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 8px 6px 12px;border-bottom:1px solid var(--kod-cizgi);font:600 11.5px/1 var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--kod-bas)}
+.komut-bas .kopyala-yazi{display:inline-flex;align-items:center;gap:6px;min-height:30px;padding:4px 10px;border:1px solid var(--kod-cizgi);border-radius:7px;background:transparent;color:var(--kod-ink);font:600 12.5px/1 var(--sans);letter-spacing:0;text-transform:none;cursor:pointer}
+.komut-bas .kopyala-yazi:hover,.komut-bas .kopyala-yazi:focus-visible{border-color:var(--kod-bas);color:var(--kod-bas)}
+.komut-bas .kopyala-yazi.tamam{border-color:#5BC08A;color:#5BC08A}
+.komut-bas .kopyala-yazi svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:1.4}
+.komut-kutu pre{margin:0;padding:12px 14px;overflow:auto;font:13px/1.6 ui-monospace,Menlo,Consolas,monospace;white-space:pre;color:var(--kod-ink);background:transparent}
+.komut-kutu pre::selection,.komut-kutu pre *::selection{background:#2F6F62}
+code.komut-ic{background:var(--kod-bg);color:var(--kod-ink);border:1px solid var(--kod-cizgi);border-radius:6px;padding:1px 6px;cursor:copy}
+/* 52: yol çipi: tıklanınca kopyala, GitHub'da aç, Gezgin'de aç */
+.yol-ayar{display:block}.yol-ayar>span:first-child{display:block;font-size:13.5px;color:var(--ink-2)}.ayar-bolum p.small{font-size:12.5px;color:var(--ink-3);margin:6px 0 0;line-height:1.45}
+.yol{display:inline;position:relative}
+.yol-cip{display:inline-flex;align-items:center;gap:5px;list-style:none;cursor:pointer;border:1px solid var(--line-2);border-radius:6px;padding:0 6px;background:var(--bg-2);font:12.5px/1.6 ui-monospace,Menlo,Consolas,monospace;color:var(--ink);overflow-wrap:anywhere}
+.yol-cip svg{width:13px;height:13px;flex:none;fill:none;stroke:var(--accent);stroke-width:1.5}
+.yol.acik>.yol-cip{border-color:var(--accent)}.yol-cip{vertical-align:baseline;max-width:100%;text-align:left}.yol-menu[hidden]{display:none}
+.yol-menu{position:absolute;z-index:30;left:0;top:calc(100% + 4px);min-width:200px;max-width:calc(100vw - 32px);background:var(--card);border:1px solid var(--line-2);border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.18);padding:4px;display:flex;flex-direction:column}
+.yol-menu button,.yol-menu a{display:block;text-align:left;border:0;background:transparent;color:var(--ink);font:500 14px/1.3 var(--sans);padding:9px 10px;border-radius:7px;text-decoration:none;cursor:pointer}
+.yol-menu button:hover,.yol-menu a:hover,.yol-menu button:focus-visible,.yol-menu a:focus-visible{background:var(--bg-2)}
+.yol-menu small{display:block;color:var(--ink-3);font-size:12px;margin-top:2px}
+.yol-kok{display:flex;gap:6px;margin-top:6px}.yol-kok input{flex:1;min-width:0;font:13px/1.4 ui-monospace,Menlo,Consolas,monospace;padding:6px 8px;border:1px solid var(--line-2);border-radius:7px;background:var(--bg);color:var(--ink)}
 .md-okuma pre{white-space:pre-wrap;font:13px/1.55 ui-monospace,Menlo,Consolas,monospace;margin:0}
 @media (max-width:640px){.md-okuma{padding:18px 16px}}
 .pdf-sayfalar{display:flex;flex-direction:column;gap:14px;align-items:flex-start;width:100%;overflow:auto;padding:4px 0 20px;overscroll-behavior:contain}
@@ -745,6 +766,10 @@ body{overflow-wrap:break-word}.steps li{grid-template-columns:auto auto minmax(0
     <label class="anahtar"><input type="checkbox" data-ayar="kaydir"><span>Kaydırarak cevap (telefonda sağa Tamamla, sola Sonra)</span></label>
     <label class="anahtar"><input type="checkbox" data-ayar="sessiz"><span>Sessiz saatler (22.00 ile 08.00 arası bildirim ve sayı yok)</span></label>
   </div>
+  <div class="ayar-bolum"><h4>Bilgisayar</h4>
+    <label class="yol-ayar"><span>Bu projenin bilgisayarındaki klasörü (yolları Gezgin'de açmak için)</span><span class="yol-kok"><input type="text" id="yerelKok" placeholder="C:\Users\adın\projeler\proje" spellcheck="false" autocomplete="off"></span></label>
+    <p class="small">Gezgin'de açmak için bilgisayarda bir kez köprü kurulur (Defter Atölyesi'ndeki görev). Kurulu değilse "Gezgin'de aç" yolu kopyalar.</p>
+  </div>
   <div class="ayar-bolum"><h4>Düğmeler</h4>
     <label class="anahtar"><input type="checkbox" data-ayar="dikte"><span>Sesle yaz (🎙)</span></label>
     <label class="anahtar"><input type="checkbox" data-ayar="takvim"><span>Takvime ekle (📅)</span></label>
@@ -945,7 +970,47 @@ body{overflow-wrap:break-word}.steps li{grid-template-columns:auto auto minmax(0
   // ```mesaj Site ajanına  -> gönderilecek mesaj kutusu (düz yazı, satır kaydırır, kopyala); ``` -> kod bloğu
   function kodBlok(satirlar,k){const ic=esc(satirlar.join('\n'));
     if(k&&k.tur==='mesaj')return '<div class="mesaj-bas">→ '+(k.hedef?inlTek(k.hedef):'Gönderilecek mesaj')+'</div><div class="kod-sar"><pre class="mesaj">'+ic+'</pre>'+kopyaSvg+'</div>';
-    return '<div class="kod-sar"><pre class="kod"><code>'+ic+'</code></pre>'+kopyaSvg+'</div>'}
+    const etiket=k&&k.tur&&k.tur!=='kod'?k.tur:(KOMUT_RE.test(satirlar[0]||'')?'Komut':'Kod');
+    return '<div class="komut-kutu"><div class="komut-bas"><span>'+esc(etiket)+'</span><button type="button" class="kopyala-yazi" data-kopyala-kutu title="Kopyala"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="5.5" y="5.5" width="8.5" height="8.5" rx="1.5"/><path d="M10.5 5.5V3.5a1.5 1.5 0 0 0-1.5-1.5H3.5A1.5 1.5 0 0 0 2 3.5V9a1.5 1.5 0 0 0 1.5 1.5h2"/></svg>Kopyala</button></div><pre><code>'+ic+'</code></pre></div>'}
+  // 52: komut ve yol tanıma: ajan özel sözdizimi yazmaz, sayfa kendisi tanır (token harcamaz)
+  const KOMUT_RE=/^\s*(\$\s*)?(python3?|py|git|gh|claude|npm|npx|pnpm|yarn|node|pip3?|cd|ls|dir|mkdir|cp|mv|rm|curl|wget|winget|powershell|pwsh|code|docker|bash|sh|ssh|scp|choco|brew|start|explorer)\b/i;
+  // yol: sürücü harfiyle (C:\...) ya da ./ ~/ / ile başlar, / ile biter, uzantılı dosyayla biter ya da en az iki ayraç taşır ("ve/veya" yol sayılmaz)
+  function yolMu(k){k=String(k).trim();if(!k||/^[a-z][a-z0-9+.-]*:\/\//i.test(k)||/[<>|*?"`]/.test(k))return false;
+    if(/^[A-Za-z]:[\\\/]/.test(k))return true;
+    if(/\s/.test(k)||!/[\/\\]/.test(k))return false;
+    if(!/^(~[\/\\]|\.{1,2}[\/\\]|[\/\\])?[\w.\-@\u00c0-\u024f]+([\/\\][\w.\-@\u00c0-\u024f]*)+$/.test(k))return false;
+    return /^(~|\.{1,2})?[\/\\]/.test(k)||/[\/\\]$/.test(k)||/\.[A-Za-z0-9]{1,6}$/.test(k)||(k.match(/[\/\\]/g)||[]).length>=2}
+  const kokAnahtar=()=>'kd-yerel-kok-'+(D.repo||D.id);
+  const yerelKok=()=>{try{return localStorage.getItem(kokAnahtar())||''}catch(e){return ''}};
+  function winYol(k){if(/^[A-Za-z]:[\\\/]/.test(k))return k.replace(/\//g,'\\');const g=yolGoreli(k);
+    if(/^(~|\/)/.test(g))return null;const kok=yerelKok().replace(/[\\\/]+$/,'');return kok?kok+'\\'+g.replace(/\//g,'\\').replace(/\\$/,''):''}
+  async function metinKopyala(t,el){let ok=false;try{await navigator.clipboard.writeText(t);ok=true}catch(e){try{const ta=document.createElement('textarea');ta.value=t;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();ok=document.execCommand('copy');ta.remove()}catch(_){}}
+    if(el){el.classList.toggle('tamam',ok);setTimeout(()=>el.classList.remove('tamam'),1600)}setStatus(ok?'kopyalandı: '+(t.length>40?t.slice(0,40)+'…':t):'kopyalanamadı; elle seç','ok');return ok}
+  document.addEventListener('click',e=>{const t=e.target;if(!t.closest)return;
+    const kk=t.closest('[data-kopyala-kutu]');if(kk){e.preventDefault();const pre=kk.closest('.komut-kutu').querySelector('pre');metinKopyala(pre?pre.textContent:'',kk);return}
+    const ki=t.closest('[data-kopyala-ic]');if(ki){e.preventDefault();metinKopyala(ki.textContent,ki);return}
+    const ya=t.closest('[data-yol-ac]');if(ya){e.preventDefault();const m=ya.nextElementSibling,ac=m.hidden;yolKapat();m.hidden=!ac;ya.setAttribute('aria-expanded',ac);ya.closest('.yol').classList.toggle('acik',ac);if(ac){m.style.left='0';m.style.right='auto';const rc=m.getBoundingClientRect();if(rc.right>innerWidth-8){m.style.left='auto';m.style.right='0'}}return}
+    const yi=t.closest('[data-yol-is]');if(yi){e.preventDefault();const d=yi.closest('.yol'),y=d.dataset.yol;yolKapat();
+      if(yi.dataset.yolIs==='kopyala'){metinKopyala(y);yolKapat();return}
+      const w=winYol(y);
+      if(w===null){metinKopyala(y);setStatus('Bu yol ajanın sunucusunda; senin bilgisayarında yok. Yol kopyalandı.','uyari');yolKapat();return}
+      if(!w){setStatus('Önce Ayarlar > Bilgisayar: bu projenin klasörünü yaz','uyari');yolKapat();setTimeout(()=>{ayarAc(true);setTimeout(()=>{const i=$('yerelKok');if(i)i.focus()},120)},60);return}
+      metinKopyala(w);let acti=false;try{const a=document.createElement('a');a.href='defter-ac:'+encodeURIComponent(w);a.target='_blank';a.rel='noopener';document.body.appendChild(a);a.click();a.remove();acti=true}catch(_){}
+      setStatus(acti?'Gezgin açılıyor; açılmazsa köprü kurulu değil (yol kopyalandı)':'Yol kopyalandı; Gezgin köprüsü kurulu değil','ok');yolKapat();return}
+    if(!t.closest('.yol'))yolKapat()});
+  function yolKapat(){document.querySelectorAll('.yol.acik').forEach(x=>{x.classList.remove('acik');const m=x.querySelector('.yol-menu');if(m)m.hidden=true;const b=x.querySelector('[data-yol-ac]');if(b)b.setAttribute('aria-expanded','false')})}
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.querySelector('.yol.acik'))yolKapat()});
+  setTimeout(()=>{const i=$('yerelKok');if(!i)return;i.value=yerelKok();i.addEventListener('change',()=>{try{localStorage.setItem(kokAnahtar(),i.value.trim())}catch(e){}setStatus('bilgisayar klasörü kaydedildi','ok')})},0);
+  function yolGoreli(k){let y=k.replace(/\\/g,'/');const rp=String(D.repo||'').split('/')[1];
+    if(rp){const i=y.indexOf('/'+rp+'/');if(/^\//.test(y)&&i>=0)y=y.slice(i+rp.length+2)}
+    return y.replace(/^\.\//,'')}
+  const yolSvg='<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M1.5 4.5a1 1 0 0 1 1-1h3.6l1.4 1.6h6a1 1 0 0 1 1 1v6.4a1 1 0 0 1-1 1h-11a1 1 0 0 1-1-1z"/></svg>';
+  const dosyaSvg='<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 1.5h5.5L13 5v9.5H4z"/><path d="M9.5 1.5V5H13"/></svg>';
+  function yolHtml(k){const g=yolGoreli(k),win=/^[A-Za-z]:\\/.test(k),dosya=/\.[A-Za-z0-9]{1,6}$/.test(k);
+    return '<span class="yol" data-yol="'+esc(k)+'"><button type="button" class="yol-cip" data-yol-ac aria-haspopup="menu" aria-expanded="false" title="Yol: tıkla, kopyala ya da aç">'+(dosya?dosyaSvg:yolSvg)+esc(k)+'</button><span class="yol-menu" role="menu" hidden>'
+      +'<button type="button" role="menuitem" data-yol-is="kopyala">Yolu kopyala</button>'
+      +(D.repo&&!win&&!/^(~|\/)/.test(g)?'<a role="menuitem" target="_blank" rel="noopener" href="https://github.com/'+esc(D.repo)+'/tree/'+esc(D.dal||'main')+'/'+g.split('/').map(encodeURIComponent).join('/')+'">GitHub\'da aç<small>'+esc(D.repo)+'</small></a>':'')
+      +'<button type="button" role="menuitem" data-yol-is="gezgin">Gezgin\'de aç<small>Bilgisayarındaki klasörde</small></button></span></span>'}
   const inlTek=x=>esc(x).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>');
   function md(t){ // hoşgörülü biçimleyici: paragraf, başlık (#..####), - * 1. listeler (iç içe), | tablo |, > alıntı, ---, **kalın**, *italik*, `kod`, [bağlantı](https://)
     const out=[];let p=[],liste=null,tablo=null,alinti=[],kod=null,kodTur={};
@@ -1002,7 +1067,10 @@ body{overflow-wrap:break-word}.steps li{grid-template-columns:auto auto minmax(0
       .replace(/\*\*(.+?)\*\*/g,'<b>$1</b>')
       .replace(/(^|[\s(])\*(?!\s)([^*\n]+?)\*(?=[\s.,;:!?)]|$)/g,'$1<em>$2</em>')
       .replace(/(^|[\s(])_(?!\s)([^_\n]+?)_(?=[\s.,;:!?)]|$)/g,'$1<em>$2</em>')
-      .replace(/\u0000(\d+)\u0000/g,(m,i)=>{const k=kodlar[+i];return '<code>'+k+'</code>'+(k.length>=6?kopyaSvg:'')})}
+      .replace(/\u0000(\d+)\u0000/g,(m,i)=>{const k=kodlar[+i],ham=k.replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"');
+        if(KOMUT_RE.test(ham))return '<code class="komut-ic" data-kopyala-ic title="Tıkla, kopyala">'+k+'</code>';
+        if(yolMu(ham))return yolHtml(ham);
+        return '<code>'+k+'</code>'+(k.length>=6?kopyaSvg:'')})}
   }
   const mdSatir=t=>md(t).replace(/^<p>([\s\S]*)<\/p>$/,'$1'); // tek paragraflık alanlar için sarmalayıcısız
   function editing(){const a=document.activeElement;if(!a)return false;if(a.isContentEditable||a.tagName==='TEXTAREA')return true;
