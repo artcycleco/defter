@@ -378,8 +378,11 @@ def kapat(veri_yolu, cift):
         veri["items"] = [m for m in veri["items"] if str(m.get("id")) not in giden]
     yaz(veri_yolu, veri)
     print("kapandi: %s  (kalan %d madde)" % (", ".join(cift[::2]), len(veri["items"])))
-    print("yapilacak: defterde ArtifactData batch (islenen belgeler silinir):")
-    print("  " + json.dumps(db_sil, ensure_ascii=False))
+    if veri.get("silinmez"):
+        print("silinmez defter: cevap ve madde belgeleri silinmez; karar kaydi yeter")
+    else:
+        print("yapilacak: defterde ArtifactData batch (islenen belgeler silinir):")
+        print("  " + json.dumps(db_sil, ensure_ascii=False))
 
 
 YAYINDA = False
