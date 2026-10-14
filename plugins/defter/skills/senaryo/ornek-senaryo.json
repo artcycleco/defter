@@ -25,10 +25,15 @@
       "ad": "İlk görüntü",
       "alanlar": {
        "Görüntü": "...",
-       "Ses": "..."
+       "Ses": "...",
+       "Prompt": "close-up of a hand in warm light, 35mm, film grain"
       },
       "bagli": [
        "K1"
+      ],
+      "sure": 8,
+      "kimler": [
+       "Anlatıcı"
       ]
      },
      {
@@ -63,7 +68,10 @@
    {
     "ad": "Anlatıcı",
     "rol": "ana",
-    "not": "Görünmez; yalnız ses"
+    "not": "Görünmez; yalnız ses",
+    "gorunus": "Görünmez",
+    "motivasyon": "Hatırlamak",
+    "ses": "Alçak, yakın"
    }
   ],
   "gunluk": [
@@ -94,8 +102,7 @@
     }
    ],
    "rec": "Önerim a: film kişisel bir yerden başlasın.",
-   "recv": "a",
-   "acildi": "2026-10-14T19:54:11Z"
+   "recv": "a"
   },
   {
    "id": "K2",
@@ -116,8 +123,7 @@
     }
    ],
    "rec": "Önerim b.",
-   "recv": "b",
-   "acildi": "2026-10-14T19:54:11Z"
+   "recv": "b"
   }
  ]
 }

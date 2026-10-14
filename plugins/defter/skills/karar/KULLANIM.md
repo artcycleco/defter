@@ -310,3 +310,37 @@ Ajan kapalı sayfayı güncellemez. Koşul gelince (o derse dair iş başlayınc
 
 Sunucu yolu (`/home/user/<repo>/...`) proje köküne göre çevrilir; projede olmayan sunucu yolu (`/tmp/...`) Gezgin'de açılmaz, kopyalanır.
 
+
+## 28. Sürüm 53 ile gelenler: senaryo defteri
+Metindeki `[O3]` gibi madde göndermesi tıklanır, maddeye gider. Kaynakta `senaryo` alanı varsa üreteç bir Senaryo sayfası, kapalı bir Değişiklikler sayfası ve indirilebilir `ekler/<id>/senaryo-<sürüm>.md` üretir. Ayrıntı `senaryo` becerisinde.
+
+## 29. Sürüm 54 ile gelenler: daha az tıklama, daha az token
+
+| Ne | Nasıl | Ajana maliyeti |
+| --- | --- | --- |
+| Klavyeyle cevap | 1 2 3 şıkkı seçer (çoklu seçimde aç kapa), Enter tamamlar, J K gezer; ilk tuş ilk maddeyi seçer, şıklarda numara görünür | Yok |
+| Değişen cümle | Sayfa son açılıştaki metni tarayıcıda hatırlar; değişen cümle ve yeni şık sarıyla işaretlenir | Eksi: `degisti` yazmak gerekmez |
+| Hazır not | Not kutusunun altında "Tamam, devam", "Sonra konuşalım", "Görsel at", "Daha basit anlat"; Ayarlar'dan kendi düğmelerin | Yok; not olarak gider |
+| Çıktıyı yapıştır | Her komut kutusunun altında; ajana komutun ilk satırıyla son 40 satır gider (`cikti [komut]`) | Çıktı başına birkaç yüz token |
+| Bunu açıkla | ⋯ menüsünde; Claude maddeyi okuyup sayfada cevaplar, seçtiğin metni soruya koyar; "Yetmedi, ajana sor" soruyu maddeye bırakır. `sample` yeteneği gerekir | Ajana yok; görüntüleyenin hesabından soru başına 1 ile 2 bin |
+| Ajan kendisi karar versin | Defterin Ayarlar'ında ve Merkez'de tür listesi; ajan `oku`da `KENDIN` satırını, oturum başında Merkez `ayar/kendin`i okur | Eksi: daha az soru |
+| Ajan rozeti | Başlıkta "Ajan: <durum> · 10 dk önce · sırada senin 2 cevabın"; `oku` her okumada `defter/_ajan` yazmasını basar | Okuma başına bir batch işlemi (~50 token) |
+| Bugün kartı | Üstte en çok üç iş: acil ve termini yakın önce, her biri tahmini süresiyle (`sure` alanı ya da metnin uzunluğundan) | Yok |
+| Ortak defter | Defteri "katkıda bulunabilir" paylaştığın kişi de cevap verir; kartta kimin ne dediği adıyla görünür (ad saklanmaz, her açılışta çözülür). `user` yeteneği gerekir | Cevapta `ortak sahip / arkadas` satırı |
+
+Şablon 54'ten eski bir defterde "Bunu açıkla" ve ortak defter için bir kez tam `capabilities` ile yayınlanır (SKILL "Defter açmak" 3).
+
+## 30. Sürüm 55 ile gelenler: senaryo sayfası
+
+| Ne | Nasıl | Ajana maliyeti |
+| --- | --- | --- |
+| Sahneye not | Her sahnenin altında not kutusu; `oku`da `SAHNE S4 -> not` | Not başına ~100 token; ajan yalnız o sahneyi açar |
+| Kare ve storyboard | Başlangıç ve bitiş karesi yükleme alanı, "+ Kare"; ajanın kareleri "Storyboard"da; tam ekranda iğne ve çizim | Kare başına bir satır (asset id ve notlar) |
+| Süre çubuğu | Sahnede saniye kutusu; üstte zaman çizelgesi, toplam, hedef aşımı | Değişen süre tek satır ve hazır komut |
+| Sürüm karşılaştırma | İki sürüm seçilir; değişen kelime yeşil ve kırmızı, değişmeyen sahne tek satır | Yok; sürüm dosyaları üretilirken yazılır |
+| Fountain ve PDF | İndir: md, Fountain, Yazdırılabilir (açılan sayfada Ctrl+P) | Yok |
+| Karakter kartları | Görünüş, motivasyon, ses, not; sahnede kim var düğmeleri | Değişen liste tek satır |
+| Üretim günlüğü | Sahne başına araç, prompt, deneme, gerekçe; kapalı sayfa ve `uretim-gunlugu.md` | Yok; `oku` kaynağa kendisi işler |
+| Sahne sırası | Sürükle bırak ya da ↑ ↓; ajana öneri olarak gider | Tek satır ve hazır `sahne-sira` komutu |
+| Okuma modu | Tam ekran, büyük yazı, ← → sahne, sesli okuma; prompt alanları görünmez | Yok |
+| Prompt kutusu | Adında "Prompt" geçen alan kopyalanır kutu | Yok |

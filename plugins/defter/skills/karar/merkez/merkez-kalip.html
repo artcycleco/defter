@@ -121,6 +121,11 @@ body.odak-kip #sorular .card.odak-bu{box-shadow:0 10px 40px rgba(0,0,0,.08)}
     <label class="anahtar"><input type="checkbox" data-ayar="kaydir"><span>Kaydırarak cevap (telefonda sağa onayla, sola sonra)</span></label>
     <label class="anahtar"><input type="checkbox" data-ayar="sessiz"><span>Sessiz saatler (22.00 ile 08.00 arası sekmede sayı yok)</span></label>
   </div>
+  <div class="ayar-bolum"><h4>Ajan kendisi karar versin</h4>
+    <p class="small">Bütün defterler için: işaretlediğin türü ajanlar sormaz, kendileri karar verip ⚙ olarak bildirir. Ajan oturum başında bir kez okur.</p>
+    <div id="kendinSec"></div>
+    <label class="yol-ayar"><span>Başka tür (virgülle)</span><span class="yol-kok"><input type="text" id="kendinGir" spellcheck="false" autocomplete="off"></span></label>
+  </div>
 </div>
 <div class="keys" id="keys" hidden>
   <button class="kapat" data-keys-kapat aria-label="Kapat">✕</button>
@@ -428,6 +433,13 @@ body.odak-kip #sorular .card.odak-bu{box-shadow:0 10px 40px rgba(0,0,0,.08)}
   bag.dataset.durum='bagli';bag.title='Bağlı; cevaplar Merkez\'in veritabanına yazılıyor';
   db.collection('defterler').onSnapshot(s=>{satirlar=s.docs.map(d=>Object.assign({},d.data()||{},{id:d.id}));ciz()},()=>{$('durum').textContent='Liste okunamadı; sayfayı yenile.'});
   db.collection('cevap').onSnapshot(s=>{cevaplar={};s.docs.forEach(d=>{cevaplar[d.id]=d.data()||{}});ciz()},()=>{});
+  // ajan kendisi karar versin: bütün defterler için (ajan oturum başında ayar/kendin belgesini okur)
+  const KENDIN=['Renk tonu ve küçük görsel ayar','Kullanıcının görmediği iç metin','Teknik ayrıntı ve araç seçimi','Dosya, klasör ve değişken adları','Sıralama ve küçük düzen'];let kendin=[];
+  const kendinCiz=()=>{const ak=document.activeElement;if(!$('kendinSec').contains(ak))$('kendinSec').innerHTML=KENDIN.map(x=>`<label class="anahtar"><input type="checkbox" data-kendin value="${esc(x)}" ${kendin.includes(x)?'checked':''}><span>${esc(x)}</span></label>`).join('');if(ak!==$('kendinGir'))$('kendinGir').value=kendin.filter(x=>!KENDIN.includes(x)).join(', ')};
+  db.doc('ayar/kendin').onSnapshot(d=>{const v=d.exists?d.data():null;kendin=(v&&Array.isArray(v.turler))?v.turler:[];kendinCiz()},()=>{});kendinCiz();
+  $('ayarPanel').addEventListener('change',e=>{const x=e.target;if(!(x.dataset&&x.dataset.kendin!==undefined)&&x.id!=='kendinGir')return;
+    kendin=[...new Set([...document.querySelectorAll('[data-kendin]:checked')].map(y=>y.value).concat($('kendinGir').value.split(',').map(y=>y.trim()).filter(Boolean)))];
+    db.doc('ayar/kendin').set({turler:kendin,updatedAt:new Date().toISOString()}).catch(()=>{})});
   db.doc('meta/surum').onSnapshot(d=>{const v=d.exists?d.data():null;son=+(v&&v.son)||0;ciz()},()=>{});
   try{mcp=await window.claude.use('mcp')}catch(e){mcp=null}
   try{izinler=await window.claude.use('permissions')}catch(e){izinler=null}

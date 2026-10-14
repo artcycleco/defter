@@ -17,6 +17,7 @@ Normal iş için yalnız bu dosya yeter. Başka dosyayı yalnız aşağıda adı
 **Dosyalar yoksa** (beceri hesaba zip olarak yüklendiyse ve `defter-yap.py` bulunamıyorsa): `artcycleco/defter` reposunu oturuma ekle (bulutta `add_repo`), `git clone --depth 1 https://github.com/artcycleco/defter /tmp/defter`, sonra proje kökünde `python3 /tmp/defter/kur/projeye-kur.py .`; bundan sonra `scripts/defter-yap.py` kullanılır. "Defter burada yok" deme; önce bu yolu dene.
 
 ## Oturum başı
+- Merkez varsa (ayar `merkez`) oturumda bir kez ArtifactData `get` Merkez `ayar/kendin`: `turler` listesindeki türleri hiçbir defterde sorma; kendin karar ver, ⚙ bildir. Defterin kendi listesi `oku`da `KENDIN` satırıdır.
 - Kanca yalnız bir şey yaptığında bağlama `[karar-defteri N] ...` satırı koyar: kopya güncellendiyse commit et; eski sürümde defter varsa her birini "yükselt". Satır yoksa her şey günceldir.
 - Beceri yolu ne `plugins` ne `.claude/skills` içindeyse (hesaba zip olarak yüklenmiş), kanca çalışmaz: ilk kullanımda bir kez `python3 ${CLAUDE_SKILL_DIR}/guncelle.py --kontrol` çalıştır. Ağdan kaynak repoyu çeker ve bu klasörü yeniler; ağ yoksa tek satır yazıp geçer.
 
@@ -49,10 +50,10 @@ Yapamadığın iş (izin reddi, erişim yok) "Senin işin"e nedeniyle yazılır.
    ```
    Madde id'si kısa önek ve sayı (W1, W2); bir kez kullanılan id bir daha kullanılmaz.
 2. Üret (komutları proje kökünden çalıştır): `python3 ${CLAUDE_SKILL_DIR}/defter-yap.py docs/defterler/veri/<ad>.json docs/defterler/<ad>.html`. Hata varsa sayfa yazılmaz; uyarıları düzelt.
-3. Yayınla: Artifact `file_path` `docs/defterler/<ad>.html`; `files` üretecin bastığı harita aynen (yollar proje köküne göre; çalışma klasörün proje kökü değilse `root` = proje kökü). İlk yayında `icon: "notebook"`, `description` = `purpose`, `capabilities: {"db": {}, "assets": {}, "downloads": true, "comments": {}, "mcp": {"servers": [{"server": "Google Drive", "tools": ["search_files", "create_file", "download_file_content", "trash_file"]}]}}`.
+3. Yayınla: Artifact `file_path` `docs/defterler/<ad>.html`; `files` üretecin bastığı harita aynen (yollar proje köküne göre; çalışma klasörün proje kökü değilse `root` = proje kökü). İlk yayında `icon: "notebook"`, `description` = `purpose`, `capabilities: {"db": {}, "assets": {}, "downloads": true, "comments": {}, "sample": {}, "user": {"scopes": ["profile"]}, "mcp": {"servers": [{"server": "Google Drive", "tools": ["search_files", "create_file", "download_file_content", "trash_file"]}]}}` (`sample`: sayfada "Bunu açıkla"; `user`: ortak defterde kim ne dedi).
 4. Dönen bağlantıyı kaynağa `"url"` olarak yaz, yeniden üret, bir kez daha yayınla (Merkez köprüsü defteri bağlantısıyla tanır; sayfa ince, ikinci yayın ucuz).
-   Sonraki her yayında Artifact'a `url` = kaynaktaki `url` ver (vermezsen yeni bir artifact açılır); `icon` ve `capabilities` verme, korunur.
-5. Satırı Merkez'e yaz (Merkez kurulu değilse `oku` "yazma yok" der, atla): `python3 ${CLAUDE_SKILL_DIR}/defter-yap.py oku docs/defterler/veri/<ad>.json --url <url> --durum "<tek satır>" --proje "<proje>"` (cevap yokken `--cevap` gerekmez), çıktının söylediği tek yazmayı yap.
+   Sonraki her yayında Artifact'a `url` = kaynaktaki `url` ver (vermezsen yeni bir artifact açılır); `icon` ve `capabilities` verme, korunur. Şablon 54'ten eski bir defteri ilk kez yükseltirken bir kez yukarıdaki `capabilities`'i tam ver (yoksa "Bunu açıkla" ve ortak defter görünmez).
+5. Satırı Merkez'e yaz (Merkez kurulu değilse `oku` "Merkez kurulu degil" der, yalnız rozet yazmasını yap): `python3 ${CLAUDE_SKILL_DIR}/defter-yap.py oku docs/defterler/veri/<ad>.json --url <url> --durum "<tek satır>" --proje "<proje>"` (cevap yokken `--cevap` gerekmez), çıktının söylediği tek yazmayı yap.
 6. Sohbette: "Defter hazır: <bağlantı>. N madde, M acil." Projenin kuralı commit istiyorsa kaynak JSON, sayfa ve ekleri commit et.
 
 Sonraki turlar: `liste` (maddeleri JSON'u okumadan gör), `goster VERI.json W3` (tek maddeyi kısa gör: şıklar, öneri, adımlar), `ekle VERI.json yeni.json` (yeni madde; var olan id'ye yalnız değişen alanları verirsen birleştirir, `title` verirsen bütün maddeyi değiştirir; `-` ile stdin), `yanitla VERI.json W3 "soru" "yanıt"`, üret, yayınla. Bir iş adımında çıkan maddeleri tek yayında topla.
@@ -96,7 +97,7 @@ Sayfa ince: maddeler sayfanın içinde; stil ve kod `defter-<özet>.css` ve `def
 
 #### İsteğe bağlı alanlar
 - `risk`: yalnız para, yayın, silme, sözleşme gibi dışa dönük ya da geri alınamayan işte (`dis | icerik | geri | donulmez`). Riskli ve acil madde sayfada şık seçmeden tamamlanmaz.
-- `degisti`: güncellediğin maddede tek satır ne değişti. `yerine`: eski kararı değiştiren madde. `daci`: `{"karar": "kullanıcı", "danis": "...", "haber": "..."}`. `sonuc`: kapanan kararın sonucu. `due`: termin. `onay`: bitince teyidi gereken kişi.
+- `degisti`: yazma; sayfa son açılıştan beri değişen cümleyi ve şıkkı kendisi sarıyla işaretler. Yalnız cümlede görünmeyen değişiklik için (şık silindi gibi) tek satır. `sure`: Bugün kartı için tahmini dakika (yalnız görev ya da uzun okumada; yoksa sayfa kendisi tahmin eder). `yerine`: eski kararı değiştiren madde. `daci`: `{"karar": "kullanıcı", "danis": "...", "haber": "..."}`. `sonuc`: kapanan kararın sonucu. `due`: termin. `onay`: bitince teyidi gereken kişi.
 - Defter düzeyinde: `"silinmez": true` (tez gibi; madde arşive geçer), `"sinir": 30` (kullanıcı onaylarsa), `"renk"`, `"butce"` (yalnız biliyorsan; tahmin uydurma).
 - Kişisel bilgi (adres, telefon, kimlik, sağlık, aile, hesap) deftere ya da rapora girecekse önce ✎ onay maddesi aç.
 
@@ -118,12 +119,14 @@ Boş satır paragraf, `**kalın**`, `- ` ve `1. ` liste, `> ` alıntı, `#### ` 
 | `TASLAK` | Tamamla'ya basılmadan yazılan not ya da seçim | Soruysa `yanitla`, istekse yap; seçimi Tamamla gelmeden uygulama. Değişmeyen taslak bir daha tek satır basılır |
 | `SENDEN` | Kullanıcının eklediği madde | İşle (yap ya da madde aç), sonra `kapat` |
 | `UYARI` | Maddesi kaynakta olmayan cevap | Kaynak canlı defterden eski: canlı sayfayı Artifact read ile al, kaynağa işle, sonra üret |
+| `KENDIN` | Kullanıcının "Ajan kendisi karar versin" listesi | O türü bu defterde sorma; kendin karar ver, ⚙ bildir |
+| `SAHNE`, `SIRA` | Senaryo sayfasından sahne notu, kare, süre, sıra | `senaryo` becerisindeki tabloya göre |
 
 4. Her cevaptan sonra: karar kaydı (`docs/KARARLAR.md` varsa `tarih | karar | defter id`), uygula, sonra `python3 ${CLAUDE_SKILL_DIR}/defter-yap.py kapat docs/defterler/veri/<ad>.json D3 "ne yaptın, tek cümle" [D4 "..."]`. Kapat maddeyi çıkarır ve karar kaydına `y` yazar (Merkez'de "Ajan: ..." satırı); veritabanında silme gerekmez, kapanan cevap bir daha basılmaz. Notlu, sorulu ya da retli cevabı başka yolla çıkarırsan üreteç durur.
-5. Üret, yayınla, `oku`nun söylediği yazmaları yap (Merkez'den gelen cevaplar deftere, Merkez satırı).
+5. Üret, yayınla, `oku`nun söylediği yazmaları yap: deftere tek `batch` (Merkez'den gelen cevaplar ve sayfa başlığındaki ajan rozeti, `defter/_ajan`) ve Merkez satırı. `--durum` rozette de görünür ("D3 uygulanıyor" gibi kısa yaz).
 6. Okuma "Defteri doldurdum" yorumuyla başladıysa: ArtifactComments `{"action": "reply", "url": <defter>, "thread_id": <yorum mesajındaki>, "text": "tek satır"}`, sonra aynı url ve thread_id ile `{"action": "resolve"}`.
 
-Cevap alanları (hepsi `oku` çıktısında yazılı; belgeyi ayrıca açma): `sinif` (onay, ret, soru, serbest, gereksiz): onay ve ret kısa işlenir, soru ve serbest notu dikkatle oku. `ret` Hayır nedeni; `ret: "Başka öner"` gelirse aynı id ile iki yeni şık sun (`degisti` yaz). `gereksiz: true`: kararı kendin ver, ⚙ bildir, bu türü bir daha sorma. `gerekce`: karar kaydına aynen. `notlar`: dosyalara ve görseldeki iğnelere yazılmış notlar (`[{ad, tur, not}]`), her biri o yere dair. `kaynak: "merkez"`: Merkez'den geldi, aynı işlenir. `bekledi`: kaç saat bekledi.
+Cevap alanları (hepsi `oku` çıktısında yazılı; belgeyi ayrıca açma): `sinif` (onay, ret, soru, serbest, gereksiz): onay ve ret kısa işlenir, soru ve serbest notu dikkatle oku. `ret` Hayır nedeni; `ret: "Başka öner"` gelirse aynı id ile iki yeni şık sun (`degisti` yaz). `gereksiz: true`: kararı kendin ver, ⚙ bildir, bu türü bir daha sorma. `gerekce`: karar kaydına aynen. `notlar`: dosyalara ve görseldeki iğnelere yazılmış notlar (`[{ad, tur, not}]`), her biri o yere dair. `kaynak: "merkez"`: Merkez'den geldi, aynı işlenir. `bekledi`: kaç saat bekledi. `cikti [komut]`: Kullanıcının komut kutusunun altına yapıştırdığı çıktı (son satırlar); ekran görüntüsü isteme, buradan oku. `ortak sahip | arkadas`: deftere birden çok kişi yazdı; sahibin sözü geçer, arkadaşın notu bilgi (çelişirse ✎ teyit sor).
 
 Cevap 24 saat taslaktır: `risk` `dis` ya da `donulmez` olan işi `kesin` gelmeden ya da 24 saat dolmadan uygulama; öteki cevaplar hemen uygulanır. Önerinden farklı bir şık seçilmesi olağandır; uygula. Yalnız not belirsizse (iki türlü okunuyorsa) ya da seçilen şıkla çelişiyorsa uygulama: notu alıntılayan bir ✎ teyit maddesi aç. Rapora gelen not geri bildirimdir; kararı değiştirecekse ayrı ✎ madde açılır. `"silinmez": true` defterde hiçbir belge silinmez; `kapat` silme önermez.
 
