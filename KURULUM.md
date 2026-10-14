@@ -4,7 +4,7 @@ Bu repoda iki beceri var. İkisi aynı sayfayı (şablon) ve aynı üreteci kull
 
 | Beceri | Klasör | Zip |
 | --- | --- | --- |
-| `defter` (Karar Defteri) | `plugins/defter/skills/karar/` | `defter-beceri.zip` |
+| `defter` (Karar Defteri; açık eklentide `karar`) | `plugins/defter/skills/karar/` | `defter-beceri.zip` |
 | `arastirma` (Araştırma Defteri) | `plugins/defter/skills/arastirma/` | `arastirma-beceri.zip` |
 
 Araştırma becerisi tek başına çalışmaz; üreteç ve sayfa `karar` becerisi (projede `defter-karar`)ndedir. Bu yüzden ikisi her yere birlikte yüklenir.
@@ -13,22 +13,22 @@ Araştırma becerisi tek başına çalışmaz; üreteç ve sayfa `karar` beceris
 
 | Nerede çalışıyorsun | Yol |
 | --- | --- |
-| claude.ai sohbet, Claude uygulaması, Cowork | 1. Zip yükle |
-| Bilgisayarda Claude Code | 2. Eklenti |
+| claude.ai sohbet, Claude uygulaması, Cowork | 1. Eklenti (claude.ai) |
+| Bilgisayarda Claude Code | 2. Eklenti (Claude Code) |
 | claude.ai/code bulut oturumu | 3. Projeye kopya |
 | Claude Science | 4. Science |
 
-## 1. claude.ai, Claude uygulaması, Cowork: zip yükle
+Herkese açık eklenti `github.com/artcycleco/defter` reposundadır; adı **Defter**, pazar adı `artcycle`. Komutlar `/defter:karar` ve `/defter:arastirma`.
+
+## 1. claude.ai, Claude uygulaması, Cowork: eklenti
 
 Bir kez yapılır; hesaba bağlıdır, bütün sohbetlerde ve uygulamalarda görünür.
 
-1. Zip'leri indir. GitHub'da repo kökünde `defter-beceri.zip` ve `arastirma-beceri.zip`; dosyaya tıkla, sağ üstte indir. Ya da Defter Atölyesi'nde beceri maddesinin ekinden.
-2. claude.ai'da sol altta adına tıkla, **Ayarlar** (Settings) aç; **Yetenekler** (Capabilities) bölümünde **Beceriler** (Skills) kısmına in. Yeni arayüzde aynı yer **Customize → Skills** olarak görünebilir.
-3. **Beceri yükle** (Upload skill) ile önce `defter-beceri.zip`, sonra `arastirma-beceri.zip` dosyasını seç. Zip'i açma; olduğu gibi yükle.
-4. Listede `defter` ve `arastirma` görünür; ikisinin de anahtarı açık olsun.
-5. Eski bir `defter` yüklüyse önce onu sil, sonra yenisini yükle; iki kopya yan yana durmasın.
+1. claude.ai'da **Customize → Plugins → Add → Add marketplace**, adres `artcycleco/defter`.
+2. Listeden **Defter**'i kur. **Customize → Skills**'te `karar` ve `arastirma` görünür.
+3. Eski **Karar defteri** eklentisi ya da elle yüklenmiş `defter` zip'i duruyorsa kaldır; iki kopya yan yana durmasın.
 
-Güncelleme: şablon sürümü artınca yeni zip'i aynı yoldan yükle. Ajan eski beceriyle çalışırsa kendisi fark eder ve sohbette tek satırla haber verir (`guncelle.py --kontrol`).
+Zip yolu (eklenti kuramayan hesaplar için): repo kökündeki iki zip'i **Customize → Skills → Upload skill** ile yükle. Bulut oturumunda zip'in yanındaki dosyalar gelmez; orada 3. yolu kullan.
 
 #### Drive köprüsü (Merkez'le eşitleme)
 
@@ -40,25 +40,14 @@ Güncelleme: şablon sürümü artınca yeni zip'i aynı yoldan yükle. Ajan esk
 
 ## 2. Bilgisayarda Claude Code: eklenti
 
-Her bilgisayarda bir kez. Repo özel olduğu için önce GitHub girişi gerekir.
+Her bilgisayarda bir kez:
 
 ```bash
-gh auth login
-gh auth setup-git
 claude plugin marketplace add artcycleco/defter
 claude plugin install defter@artcycle --scope user
 ```
 
-Eklenti iki beceriyi birlikte getirir: `/defter:karar` ve `/defter:arastirma`. Kısa adla da çağrılır (`/defter-karar`).
-
-Otomatik güncelleme için repoyu bir kez klonlayıp şunu çalıştır; eski kopyaları siler ve pazarı otomatik güncellemeye alır:
-
-```bash
-git clone --depth 1 https://github.com/artcycleco/defter ~/karar-defteri
-python3 ~/karar-defteri/kur/kullaniciya-kur.py
-```
-
-Windows'ta `python3` yerine `python`. Elle güncellemek istersen: `claude plugin update defter@artcycle`.
+Güncellemek için: `claude plugin marketplace update artcycle` sonra `claude plugin update defter@artcycle`.
 
 ## 3. Bulut oturumu (claude.ai/code): projeye kopya
 
@@ -80,7 +69,7 @@ Kurulunca projede şunlar olur:
 | `.claude/settings.json` | Oturum başı kancası: kaynakta yeni sürüm varsa kopyayı tazeler |
 | `.gitignore` | `.merkez/` (okuma önbelleği git'e girmez) |
 
-Oturum karar-defteri reposuna erişemiyorsa kanca sessizce geçer. O oturumda ajana "artcycleco/defter reposunu ekle" demen yeter.
+Oturum defter reposuna erişemiyorsa kanca sessizce geçer. O oturumda ajana "artcycleco/defter reposunu ekle" demen yeter.
 
 ## 4. Claude Science
 
