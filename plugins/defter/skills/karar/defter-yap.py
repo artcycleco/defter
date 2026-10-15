@@ -833,8 +833,10 @@ def uret(veri_yolu, cikti_yolu, sablon=SABLON, tek=False):
         if dep:
             veri = dict(veri, repo=dep[0], dal=dep[1])
     duzeltme = secenek_duzelt(veri)   # kaynakta da duzelir: ajan bir sonraki turda temiz veriyle calisir
-    if duzeltme:
-        yaz(veri_yolu, veri)
+    if duzeltme:   # kaynaga yalniz sik duzeltmesi yazilir (merkez, repo gibi uretimde eklenenler yazilmaz)
+        kaynak = json.loads(io.open(veri_yolu, encoding="utf-8").read())
+        secenek_duzelt(kaynak)
+        yaz(veri_yolu, kaynak)
     veri, sen_harita = senaryo_isle(veri, cikti_yolu)
     hata, yapi_uyari = yapisal(veri)
     yapi_uyari += duzeltme
