@@ -421,7 +421,8 @@ def senaryo_isle(veri, cikti_yolu):
             rel = str(yol.relative_to(pathlib.Path.cwd().resolve()))
         except ValueError:
             rel = str(yol)
-        harita[goreli] = rel
+        # sunucu .fountain uzantisini tanimaz: duz metin olarak gider (indirilen ad yine .fountain)
+        harita[goreli] = {"from": rel, "contentType": "text/plain"} if ad.endswith(".fountain") else rel
         dosya[anahtar] = goreli
     metin = _senaryo_md(s, maddeler)
     yaz_ek("senaryo-%s.md" % sur, metin, "md")
