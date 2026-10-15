@@ -38,7 +38,9 @@ Claude'a "defter aç" de. İlk seferde adını sorar ve `docs/defterler/ayar.jso
 
 #### Veri
 
-Cevaplar yalnız defter sayfasının kendi veritabanında durur. İstersen (Google Drive izni verirsen) defter, açık sorularını ve cevaplarını kendi Drive'ındaki "Defter Esitleme" klasörüne küçük bir dosya olarak bırakır; Merkez oradan okur. Başka hiçbir yere veri gitmez.
+Cevaplar yalnız defter sayfasının kendi veritabanında durur. İstersen (Google Drive izni verirsen) defter, açık sorularını ve cevaplarını kendi Drive'ındaki "Defter Esitleme" klasörüne küçük bir dosya olarak bırakır; Merkez oradan okur. Araştırma defteri (`/defter:arastirma`) kaynak ararken akademik dizinlere arama sorgusu gönderir: OpenAlex, Crossref, Unpaywall, Semantic Scholar, CORE; `ayar.json`'a e-posta yazdıysan OpenAlex ve Unpaywall'a iletişim adresi olarak gider. Bunların dışında hiçbir yere veri gitmez.
+
+*Data: answers stay in the notebook artifact's own database; optionally a small summary goes to the user's own Google Drive. The research skill sends search queries (and, if set, the user's contact e-mail) to OpenAlex, Crossref, Unpaywall, Semantic Scholar and CORE. Nothing else leaves the platform.*
 
 #### Lisans
 
