@@ -455,7 +455,7 @@ def senaryo_isle(veri, cikti_yolu):
         sayfalar.append({"id": "uretim", "ad": "Üretim günlüğü", "durum": "kapali", "kosul": "Yöntem bölümü ya da yapay zekâ beyanı yazarken",
                          "body": "[Günlüğü indir (md)](%s)\n\n" % dosya["uretim"] + "\n".join(ug[2:])})
     # sayfaya yapilandirilmis senaryo gider; sayfa onu kendisi cizer (not, kare, sure, sira, okuma modu)
-    sd = {k: s[k] for k in ("ad", "surum", "tarih", "bilgi", "logline", "ana_fikir", "bolumler", "karakterler", "hedef_sure") if s.get(k)}
+    sd = {k: s[k] for k in ("ad", "surum", "tarih", "bilgi", "logline", "ana_fikir", "bolumler", "karakterler", "hedef_sure", "gunluk") if s.get(k)}   # gunluk: baska oturum ice-al ile geri alabilsin
     sd["surumler"] = [str(g.get("surum")) for g in s.get("gunluk") or [] if g.get("surum")]
     sd["dosya"] = dosya
     veri = dict(veri, sayfalar=sayfalar, senaryo=sd)
@@ -628,6 +628,12 @@ def ice_al(sayfa_yolu, veri_yolu):
         sys.exit("ice-al: bu sayfa maddeleri ayri dosyada tutuyor (%s); o dosyayi Artifact read ile al, kaynak olarak kullan" % v["veri"])
     for k in ("veri", "uretildi", "merkez", "repo", "dal"):
         v.pop(k, None)
+    if isinstance(v.get("senaryo"), dict):   # sablon 55: sayfadaki senaryo uretilmis alanlar tasir; kaynaga yalniz yapi doner
+        for k in ("surumler", "dosya"):
+            v["senaryo"].pop(k, None)
+        v["sayfalar"] = [x for x in v.get("sayfalar") or [] if x.get("id") not in ("senaryo", "degisiklikler", "uretim")]
+        if not v["sayfalar"]:
+            v.pop("sayfalar")
     if pathlib.Path(veri_yolu).exists():
         sys.exit("ice-al: %s zaten var; ustune yazmam" % veri_yolu)
     pathlib.Path(veri_yolu).parent.mkdir(parents=True, exist_ok=True)
