@@ -147,6 +147,39 @@ def cumle_say(metin):
     return len([c for c in re.split(r"(?<=[.!?])\s+", metin.strip()) if c])
 
 
+def secenek_duzelt(veri):
+    """Sik baska adla yazildiysa (text, label, ad; ya da duz metin) dogru alana tasir; oneri yalniz harfse sikkin adini yazar.
+    Sayfada bos sik cikmasin (eski surumlerde ajan baska ad yazinca siklar bos gorunuyordu)."""
+    notlar = []
+    for it in veri.get("items") or []:
+        if not isinstance(it.get("options"), list):
+            continue
+        yeni = []
+        for i, o in enumerate(it["options"]):
+            harf = chr(97 + i)
+            if not isinstance(o, dict):
+                yeni.append({"v": harf, "t": str(o or "")})
+                notlar.append("%s: sik %d duz metin; {v, t} olarak yazildi" % (it.get("id"), i + 1))
+                continue
+            v = next((o[k] for k in ("v", "id", "value", "key", "deger") if o.get(k) not in (None, "")), harf)
+            t = next((o[k] for k in ("t", "text", "label", "ad", "baslik", "title", "name", "secenek") if isinstance(o.get(k), str) and o[k].strip()), "")
+            d = next((o[k] for k in ("d", "desc", "description", "aciklama") if isinstance(o.get(k), str) and o[k].strip()), None)
+            if (o.get("t") or "") != t or o.get("v") != v:
+                notlar.append("%s: sik %d alan adi \"t\"/\"v\" degil; duzeltildi" % (it.get("id"), i + 1))
+            n = {k: x for k, x in o.items() if k not in ("id", "value", "key", "deger", "text", "label", "ad", "baslik", "title", "name", "secenek", "desc", "description", "aciklama")}
+            n.update({"v": str(v), "t": t})
+            if d:
+                n["d"] = d
+            yeni.append(n)
+        it["options"] = yeni
+        rec = str(it.get("rec") or "").strip().lower()
+        sec = next((o for o in yeni if rec and rec == str(o["v"]).lower()), None)
+        if sec and sec["t"]:
+            it["rec"] = sec["t"]
+            notlar.append("%s: rec yalniz sik harfiydi; onerinin cumlesini yaz" % it.get("id"))
+    return notlar
+
+
 def yapisal(veri):
     """Kural ihlallerini bulur: ağır olanlar hata (liste 1), hafifler uyarı (liste 2)."""
     hata, uyari = [], []
@@ -189,6 +222,8 @@ def yapisal(veri):
                 uyari.append("%s: design maddesinde 'rec' (oneri) yok" % iid)
             if secenek and not it.get("recv"):
                 uyari.append("%s: secenekli design maddesinde 'recv' yok" % iid)
+        if any(not str(o.get("t") or "").strip() for o in secenek if isinstance(o, dict)):
+            hata.append("%s: bos sik var; her sikka \"t\" (gorunen metin) yaz" % iid)
         vler = [o.get("v") for o in secenek]
         recv = it.get("recv")
         if recv and secenek and any(v not in vler for v in (recv if isinstance(recv, list) else [recv])):
@@ -797,8 +832,12 @@ def uret(veri_yolu, cikti_yolu, sablon=SABLON, tek=False):
         dep = _depo(veri_yolu)
         if dep:
             veri = dict(veri, repo=dep[0], dal=dep[1])
+    duzeltme = secenek_duzelt(veri)   # kaynakta da duzelir: ajan bir sonraki turda temiz veriyle calisir
+    if duzeltme:
+        yaz(veri_yolu, veri)
     veri, sen_harita = senaryo_isle(veri, cikti_yolu)
     hata, yapi_uyari = yapisal(veri)
+    yapi_uyari += duzeltme
     kapanis_denetle(veri, veri_yolu, hata, yapi_uyari)
     if not veri.get("url") and pathlib.Path(cikti_yolu).exists():
         yapi_uyari.append("kaynakta url yok: ilk yayindan sonra defterin baglantisini \"url\" olarak yaz (Merkez'le esitleme onunla tanir)")
