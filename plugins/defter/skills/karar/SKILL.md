@@ -9,7 +9,7 @@ Normal iş için yalnız bu dosya yeter. Başka dosyayı yalnız aşağıda adı
 | Dosya | Ne | Ne zaman açılır |
 | --- | --- | --- |
 | `${CLAUDE_SKILL_DIR}/defter-yap.py` | Üreteç; tek araç | Hiç okuma, yalnız çalıştır |
-| `${CLAUDE_SKILL_DIR}/karar-defteri.html` | Şablon | Hiç açma, okuma, kopyalama |
+| `${CLAUDE_SKILL_DIR}/karar-defteri.html`, `.css`, `.js` | Şablon (üç dosya) | Hiç açma, okuma, kopyalama |
 | `${CLAUDE_SKILL_DIR}/YAZIM-KURALI.md` | Kullanıcıya yazılan metnin biçim kuralı | Uzun rapor yazmadan önce bir kez |
 | `${CLAUDE_SKILL_DIR}/KULLANIM.md` | Başvuru: bütün JSON alanları, sayfanın özellikleri, sürüm notları | Bu dosyada olmayan bir alan gerekince, yalnız o bölüm |
 | `${CLAUDE_SKILL_DIR}/ARASTIRMA-PROTOKOLU.md` | Akademik kaynak araştırması | Yalnız araştırma işinde (`arastirma` becerisi yoksa) |

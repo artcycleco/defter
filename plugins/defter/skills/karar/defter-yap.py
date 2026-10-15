@@ -34,6 +34,18 @@ Sablon:  bu dosyanin yanindaki karar-defteri.html (degismez; kaynak: karar-defte
 import datetime, html, io, json, re, sys, pathlib
 
 SABLON = pathlib.Path(__file__).resolve().parent / "karar-defteri.html"   # beceri klasorunde, ureteçle yan yana
+def sablon_metni(yol=None):
+    """Sablon uc dosya (Dizin'in dosya basina 256 KiB siniri): karar-defteri.html icindeki /*@x.css*/ ve //@x.js
+    isaretleri yanindaki dosyanin icerigiyle doldurulur. Eski tek dosyali sablon da okunur."""
+    yol = pathlib.Path(yol or SABLON)
+    s = io.open(yol, encoding="utf-8").read()
+    for m in re.findall(r"/\*@([\w.-]+\.css)\*/|//@([\w.-]+\.js)", s):
+        ad = m[0] or m[1]
+        isaret = ("/*@%s*/" % ad) if m[0] else ("//@%s" % ad)
+        s = s.replace(isaret, io.open(yol.parent / ad, encoding="utf-8").read().rstrip("\n"), 1)
+    return s
+
+
 BAS = '<script type="application/json" id="defter">'
 SON = '</script>'
 
@@ -867,7 +879,7 @@ def uret(veri_yolu, cikti_yolu, sablon=SABLON, tek=False):
     eski_veri = cikti.with_name(cikti.stem + ".veri.json")
     if eski_veri.exists():
         eski_veri.unlink()   # sablon 51: maddeler sayfanin icinde; ayri veri.json yok
-    h = io.open(sablon, encoding="utf-8").read()
+    h = sablon_metni(sablon)
     i = h.index(BAS)
     j = h.index(SON, i)
     h = h[: i + len(BAS)] + "\n" + gorunen + "\n" + h[j:]

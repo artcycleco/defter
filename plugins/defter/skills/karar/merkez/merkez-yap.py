@@ -29,6 +29,8 @@ def eleman(html, desen, etiket):
 
 def main():
     s = io.open(SABLON, encoding="utf-8").read()
+    for ad in re.findall(r"/\*@([\w.-]+\.css)\*/", s):   # sablon uc dosya: stil yanindaki .css dosyasinda
+        s = s.replace("/*@%s*/" % ad, io.open(SABLON.parent / ad, encoding="utf-8").read().rstrip("\n"))
     k = io.open(KOK / "merkez-kalip.html", encoding="utf-8").read()
     stil = re.search(r"<style>(.*?)</style>", s, re.S).group(1)
     logo = eleman(s, r'<svg class="diyafram-logo"', "svg").replace('width="26" height="26"', 'width="28" height="28"')
