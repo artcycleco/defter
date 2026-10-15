@@ -19,6 +19,7 @@ Normal iş için yalnız bu dosya yeter. Başka dosyayı yalnız aşağıda adı
 ## Oturum başı
 - Merkez varsa (ayar `merkez`) oturumda bir kez ArtifactData `get` Merkez `ayar/kendin`: `turler` listesindeki türleri hiçbir defterde sorma; kendin karar ver, ⚙ bildir. Defterin kendi listesi `oku`da `KENDIN` satırıdır.
 - Kanca yalnız bir şey yaptığında bağlama `[karar-defteri N] ...` satırı koyar: kopya güncellendiyse commit et; eski sürümde defter varsa her birini "yükselt". Satır yoksa her şey günceldir.
+- Eklenti kancasız kurulduysa (açık sürüm `defter` eklentisinde kanca yok): oturumdaki ilk defter işinden önce bir kez `python3 ${CLAUDE_SKILL_DIR}/guncelle.py --eklenti` çalıştır; aynı satırı o basar, boşsa her şey günceldir. Ağa çıkmaz.
 - Beceri yolu ne `plugins` ne `.claude/skills` içindeyse (hesaba zip olarak yüklenmiş), kanca çalışmaz: ilk kullanımda bir kez `python3 ${CLAUDE_SKILL_DIR}/guncelle.py --kontrol` çalıştır. Ağdan kaynak repoyu çeker ve bu klasörü yeniler; ağ yoksa tek satır yazıp geçer.
 
 ## Ayar
